@@ -40,6 +40,10 @@ impl Session {
     }
     pub fn run(&mut self) {
         self.get_action();
-        println!("{:?}", &self.actions);
+        match self.action {
+            Action::v => {}
+            Action::a => {}
+        }
+        println!("{:?}", &self.action);
     }
 }
