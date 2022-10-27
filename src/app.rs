@@ -12,11 +12,11 @@ pub enum Action {
 struct InputError;
 
 impl Action {
-    fn from_string(s: &str) -> Result<Action, InputError>{
+    fn from_string(s: &str) -> Result<Action, InputError> {
         match s {
             "v" => Ok(Action::v),
             "a" => Ok(Action::a),
-            _ => Err(InputError)
+            _ => Err(InputError),
         }
     }
 }
