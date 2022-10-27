@@ -29,14 +29,8 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new(self, args: Vec<String>) -> Self {
-        Session {
-            args,
-            action: self.get_action(),
-        }
-    }
-    fn add_todo() {
-        todo!()
+    pub fn new(args: Vec<String>) -> Self {
+        Session { args }
     }
     fn get_action(&mut self) -> Action {
         Action::from_string(self.args.first().unwrap()).expect("Argument error!")
