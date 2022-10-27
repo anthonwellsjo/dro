@@ -45,7 +45,9 @@ impl Session {
         let action = get_action(&self.args);
         match action {
             Action::v => {}
-            Action::a => {}
+            Action::a => {
+                self.add_todo();
+            }
         }
         println!("{:?}", &self.action);
     }
