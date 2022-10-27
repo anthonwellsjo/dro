@@ -35,12 +35,8 @@ impl Session {
     fn add_todo(){
         todo!()
     }
-    fn get_action(&mut self){
-        for x in self.args.iter() {
-            let action = Action::from_string(x).expect("Argument error!");
-            self.actions.push(action);
-        }
-
+    fn get_action(&mut self) -> Action {
+        Action::from_string(self.args.first().unwrap()).expect("Argument error!")
     }
     pub fn run(&mut self) {
         self.get_action();
