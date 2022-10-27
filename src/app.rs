@@ -42,8 +42,8 @@ impl Session {
         db::save_todo_to_db(to_do).expect("A problem occured while saving to todo");
     }
     pub fn run(&mut self) {
-        self.get_action();
-        match self.action {
+        let action = get_action(&self.args);
+        match action {
             Action::v => {}
             Action::a => {}
         }
