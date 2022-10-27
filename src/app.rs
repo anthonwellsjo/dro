@@ -49,6 +49,5 @@ impl Session {
                 self.add_todo();
             }
         }
-        println!("{:?}", &self.action);
     }
 }
