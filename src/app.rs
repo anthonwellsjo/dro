@@ -32,7 +32,7 @@ impl Session {
             action: self.get_action(),
         }
     }
-    fn add_todo(){
+    fn add_todo() {
         todo!()
     }
     fn get_action(&mut self) -> Action {
