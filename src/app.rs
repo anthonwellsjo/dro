@@ -1,4 +1,3 @@
-
 mod db;
 pub mod utils;
 
@@ -45,4 +44,3 @@ impl Session {
         println!("{:?}", &self.actions);
     }
 }
-
