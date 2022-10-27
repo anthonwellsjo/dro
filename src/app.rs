@@ -22,12 +22,15 @@ impl Action {
 
 pub struct Session {
     args: Vec<String>,
-    actions: Vec<Action>
+    action: Action,
 }
 
 impl Session {
-    pub fn new(args: Vec<String>) -> Self {
-        Session { args, actions: vec![] }
+    pub fn new(self, args: Vec<String>) -> Self {
+        Session {
+            args,
+            action: self.get_action(),
+        }
     }
     fn add_todo(){
         todo!()
