@@ -1,6 +1,6 @@
 mod app;
 
-use app::utils::get_arg;
+use app::utils::get_args;
 
 fn main() {
     let args = get_arg(1);
