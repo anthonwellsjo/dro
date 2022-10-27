@@ -21,7 +21,6 @@ impl Action {
     }
 }
 
-
 pub struct Session {
     args: Vec<String>,
     actions: Vec<Action>
