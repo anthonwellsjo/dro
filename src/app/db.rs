@@ -15,6 +15,12 @@ impl ToDo {
             done: false,
         }
     }
+    pub fn show_as_check(&self) -> String {
+        match &self.done {
+            true => "X".to_string(),
+            false => "".to_string(),
+        }
+    }
 }
 
 ///  Gets connection to DB. This function will create a new DB if
