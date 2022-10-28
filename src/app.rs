@@ -57,4 +57,17 @@ impl Session {
             }
         }
     }
+
+    fn show_todos(&self) {
+        let todos = db::get_todos().expect("Error while getting todos.");
+
+        for (index, todo) in todos.iter().enumerate() {
+            println!("{} {} {}", index, todo.show_as_check(), todo.description)
+        }
+    }
+
+    fn markdone(&mut self) {
+        let arg = get_argument(&mut self.args).expect("You forgot to add which dro to mark as done."); 
+        println!("You are deleting dro no {}", arg);
+    }
 }
