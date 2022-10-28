@@ -7,8 +7,9 @@ pub mod utils;
 
 #[derive(Debug)]
 pub enum Action {
-    v,
-    a,
+    View,
+    Add,
+    Markdone
 }
 
 #[derive(Debug)]
