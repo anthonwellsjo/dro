@@ -18,8 +18,9 @@ struct InputError;
 impl Action {
     fn from_string(s: &str) -> Result<Action, InputError> {
         match s {
-            "v" => Ok(Action::v),
-            "a" => Ok(Action::a),
+            "v" | "view" => Ok(Action::View),
+            "a" | "add" => Ok(Action::Add),
+            "md" | "markdone" => Ok(Action::Markdone),
             _ => Err(InputError),
         }
     }
