@@ -46,9 +46,14 @@ impl Session {
     pub fn run(&mut self) {
         let action = get_action(&self.args);
         match action {
-            Action::v => {}
-            Action::a => {
+            Action::View => {
+                self.show_todos();
+            }
+            Action::Add => {
                 self.add_todo();
+            }
+            Action::Markdone => {
+                self.markdone();
             }
         }
     }
