@@ -99,7 +99,7 @@ pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
 
 /// Deletes a todo to the database
 /// # Arguments
-/// * `to_do` - In instance of the ToDo struct that will be saved.
+/// * `description` - The description that matches the todo that should be deleted
 /// # Examples
 /// ```
 /// use core::db::{ToDo, save_todo_to_db, delete_todo_from_db};
