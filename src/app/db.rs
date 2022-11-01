@@ -92,7 +92,7 @@ pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
     )?;
 
     conn.close()
-        .unwrap_or_else(|_| panic!("Panickin while closing conection."));
+        .unwrap_or_else(|_| panic!("Panicking while closing conection."));
 
     Ok(to_do)
 }
