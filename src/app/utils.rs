@@ -15,6 +15,18 @@ pub fn get_argument(args: &mut Vec<String>) -> Option<&str> {
         }
     }
 }
+pub fn get_md_or_mu_index_argument(args: &mut Vec<String>) -> Option<usize> {
+    match args.get_mut(1) {
+        Some(x) => Some(
+            x.trim()
+                .parse()
+                .expect("Expected a number as second argument."),
+        ),
+        None => {
+            panic!("Argument missing.")
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
