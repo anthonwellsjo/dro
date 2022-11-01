@@ -9,7 +9,7 @@ pub mod utils;
 pub enum Action {
     View,
     Add,
-    Markdone
+    Markdone,
 }
 
 #[derive(Debug)]
