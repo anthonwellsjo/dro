@@ -67,7 +67,20 @@ impl Session {
     }
 
     fn markdone(&mut self) {
-        let arg = get_argument(&mut self.args).expect("You forgot to add which dro to mark as done."); 
-        println!("You are deleting dro no {}", arg);
+        let arg = get_md_or_mu_index_argument(&mut self.args).unwrap();
+        let todos = db::get_todos().expect("Error while getting todos.");
+        let description: &str;
+        match &todos.get(arg) {
+            Some(todo) => description = &todo.description,
+            None => {
+                println!("Could not find any dro on index {}", arg);
+                return;
+            }
+        }
+
+        match db::mark_todo_as_done(description) {
+            Ok(()) => println!("Updated dro on index {} successfully.", arg),
+            Err(error) => println!("Could not update dro at porsition {}: {}", arg, error),
+        }
     }
 }
