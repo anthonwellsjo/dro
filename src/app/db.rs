@@ -129,6 +129,20 @@ pub fn mark_todo_as_done(description: &str) -> Result<()> {
     Ok(())
 }
 
+/// Marks todo as done
+/// # Arguments
+/// * `description` - The description that matches todo that should get updated.
+pub fn mark_todo_as_undone(description: &str) -> Result<()> {
+    let conn = get_db_connection()?;
+    conn.execute(
+        "UPDATE to_dos SET done=0 WHERE description=(?1)",
+        &[&description],
+    )?;
+    conn.close()
+        .unwrap_or_else(|_| panic!("Panickin while closing conection."));
+    Ok(())
+}
+
 /// Gets db-path which depends on wether we are running a test or not.
 fn get_db_path() -> &'static str {
     if cfg!(test) {
