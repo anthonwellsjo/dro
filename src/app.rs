@@ -11,6 +11,8 @@ pub enum Action {
     Add,
     MarkAsDone,
     MarkAsUndone,
+    Purge,
+    Help,
 }
 
 #[derive(Debug)]
@@ -23,6 +25,8 @@ impl Action {
             "a" | "add" => Ok(Action::Add),
             "md" | "markdone" => Ok(Action::MarkAsDone),
             "mu" | "markundone" => Ok(Action::MarkAsUndone),
+            "pu" | "purge" => Ok(Action::Purge),
+            "h" | "help" => Ok(Action::Help),
             _ => Err(InputError),
         }
     }
@@ -59,6 +63,12 @@ impl Session {
             }
             Action::MarkAsUndone => {
                 self.mark_as_undone();
+            }
+            Action::Purge => {
+                self.purge_todos();
+            }
+            Action::Help => {
+                self.show_help();
             }
         }
     }
