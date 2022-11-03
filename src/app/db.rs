@@ -162,6 +162,11 @@ mod tests {
     use std::fs;
 
     #[test]
+    fn grab_todos() {
+        todo!()
+    }
+
+    #[test]
     fn save_a_todo() {
         let description = "Test description";
         let to_do = ToDo::new(description);
@@ -180,6 +185,11 @@ mod tests {
 
         let todos = get_todos().unwrap();
         assert!(&todos.iter().any(|x| x.description == description_two));
+    }
+
+    #[test]
+    fn mark_todo_as_done() {
+        todo!()
     }
 
     #[test]
