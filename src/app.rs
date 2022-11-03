@@ -116,4 +116,13 @@ impl Session {
             Err(error) => println!("Could not update dro at porsition {}: {}", arg, error),
         }
     }
+
+    fn purge_todos(&self) {
+        db::purge_todos().expect("A problem occured while purging.");
+        println!("All done dro's were deleted successfully!");
+    }
+
+    fn show_help(&self) {
+        todo!()
+    }
 }
