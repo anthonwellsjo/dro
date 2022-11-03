@@ -32,7 +32,8 @@ pub fn get_db_connection() -> Result<Connection> {
              id INTEGER PRIMARY KEY,
              description TEXT NOT NULL,
              done BOOL NOT NULL,
-             created TEXT DEFAULT CURRENT_TIMESTAMP 
+             created TEXT DEFAULT CURRENT_TIMESTAMP,
+             deleted BOOL DEFAULT 0
          )",
         [],
     )?;
