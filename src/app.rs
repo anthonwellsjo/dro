@@ -9,7 +9,8 @@ pub mod utils;
 pub enum Action {
     View,
     Add,
-    Markdone,
+    MarkAsDone,
+    MarkAsUndone,
 }
 
 #[derive(Debug)]
@@ -20,7 +21,8 @@ impl Action {
         match s {
             "v" | "view" => Ok(Action::View),
             "a" | "add" => Ok(Action::Add),
-            "md" | "markdone" => Ok(Action::Markdone),
+            "md" | "markdone" => Ok(Action::MarkAsDone),
+            "mu" | "markundone" => Ok(Action::MarkAsUndone),
             _ => Err(InputError),
         }
     }
@@ -52,8 +54,11 @@ impl Session {
             Action::Add => {
                 self.add_todo();
             }
-            Action::Markdone => {
-                self.markdone();
+            Action::MarkAsDone => {
+                self.mark_as_done();
+            }
+            Action::MarkAsUndone => {
+                self.mark_as_undone();
             }
         }
     }
