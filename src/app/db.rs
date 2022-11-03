@@ -51,7 +51,8 @@ pub fn get_todos() -> Result<Vec<ToDo>> {
 
     let mut stmt = conn.prepare(
         "SELECT description, done
-         FROM to_dos",
+         FROM to_dos 
+         WHERE deleted=0",
     )?;
 
     let to_dos = stmt.query_map([], |row| {
