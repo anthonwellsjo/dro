@@ -145,6 +145,17 @@ pub fn mark_todo_as_undone(description: &str) -> Result<()> {
     Ok(())
 }
 
+pub fn purge_todos() -> Result<()> {
+    let conn = get_db_connection()?;
+    conn.execute(
+        "UPDATE to_dos SET deleted=1 WHERE done=1",
+        []
+    )?;
+    conn.close()
+        .unwrap_or_else(|_| panic!("Panickin while closing conection."));
+    Ok(())
+}
+
 /// Gets db-path which depends on wether we are running a test or not.
 fn get_db_path() -> &'static str {
     if cfg!(test) {
