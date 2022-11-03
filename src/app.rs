@@ -71,7 +71,7 @@ impl Session {
         }
     }
 
-    fn markdone(&mut self) {
+    fn mark_as_done(&mut self) {
         let arg = get_md_or_mu_index_argument(&mut self.args).unwrap();
         let todos = db::get_todos().expect("Error while getting todos.");
         let description: &str;
