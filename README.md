@@ -1,5 +1,6 @@
 # dro
-###### super minimal cli todo (dro) application
+###### a super minimal cli todo (dro) application
+---
 
 often lurking in the terminal? just want to keep track of your daily tasks in a minimalist, straight forward manner?
 
