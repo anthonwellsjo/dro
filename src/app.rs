@@ -43,10 +43,7 @@ impl Session {
     fn add_todo(&mut self) {
         let description = get_argument(&mut self.args)
             .expect("Error while getting the description for the todo.");
-        let to_do = db::ToDo {
-            description: description.to_string(),
-            done: false,
-        };
+        let to_do = db::ToDo::new(description);
         db::save_todo_to_db(to_do).expect("A problem occured while saving to todo");
     }
     pub fn run(&mut self) {
