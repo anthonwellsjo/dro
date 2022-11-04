@@ -110,17 +110,6 @@ pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
 /// let res = save_todo_to_db(to_do);
 /// mark_todo_as_done(&todo.description);
 /// ```
-pub fn delete_todo_from_db(description: &str) -> Result<()> {
-    let conn = get_db_connection()?;
-    conn.execute("DELETE FROM to_dos WHERE description=(?1)", &[&description])?;
-    conn.close()
-        .unwrap_or_else(|_| panic!("Panickin while closing conection."));
-    Ok(())
-}
-
-/// Marks todo as done
-/// # Arguments
-/// * `description` - The description that matches todo that should get updated.
 pub fn mark_todo_as_done(description: &str) -> Result<()> {
     let conn = get_db_connection()?;
     conn.execute(
@@ -188,8 +177,6 @@ fn get_db_path() -> &'static str {
 #[cfg(test)]
 mod tests {
 
-    use crate::app::db::delete_todo_from_db;
-
     use super::{get_todos, save_todo_to_db, ToDo, TEST_DB_PATH};
     use rand::Rng;
     use std::fs;
@@ -223,27 +210,6 @@ mod tests {
     #[test]
     fn mark_todo_as_done() {
         todo!()
-    }
-
-    #[test]
-    fn save_and_delete_todos_from_db() {
-        //Arrange: Create and save todos to db + assert
-        let description = TestUtils::create_rnd_string();
-        let to_do = ToDo::new(&description);
-        save_todo_to_db(to_do).unwrap();
-        let todos = get_todos().unwrap();
-        let todo_from_db = &todos.iter().find(|i| i.description == description);
-        assert!(&todos.iter().any(|x| x.description == description));
-        assert_eq!(todo_from_db.is_some(), true);
-
-        //Act: Delete todo
-        let resp = delete_todo_from_db(&description);
-        let todos = get_todos().unwrap();
-        let todo_from_db = &todos.iter().find(|i| i.description == description);
-
-        //Assert
-        assert_eq!(resp, Ok(()));
-        assert_eq!(todo_from_db.is_some(), false);
     }
 
     #[test]
