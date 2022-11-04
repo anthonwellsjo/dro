@@ -6,13 +6,18 @@ pub fn get_args() -> Vec<String> {
     args[1..].to_vec()
 }
 pub fn get_action(args: &Vec<String>) -> Action {
-    Action::from_string(args.first().unwrap()).expect("Argument error! No action.")
+    Action::from_string(args.first().unwrap_or_else(|| {
+        println!("Found no action. Run `help` for documentation.");
+        process::exit(1)
+    }))
+    .expect("Argument error! No action.")
 }
 pub fn get_argument(args: &mut Vec<String>) -> Option<&str> {
     match args.get_mut(1) {
         Some(x) => Some(x),
         None => {
-            panic!("Argument missing.")
+            println!("Argument missing. Run `help` for documentation.");
+            process::exit(1)
         }
     }
 }
@@ -24,7 +29,8 @@ pub fn get_md_or_mu_index_argument(args: &mut Vec<String>) -> Option<usize> {
                 .expect("Expected a number as second argument."),
         ),
         None => {
-            panic!("Argument missing.")
+            println!("Argument missing. Run `help` for documentation.");
+            process::exit(1)
         }
     }
 }
