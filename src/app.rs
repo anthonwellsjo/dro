@@ -85,14 +85,14 @@ impl Session {
         match &todos.get(arg) {
             Some(todo) => description = &todo.description,
             None => {
-                println!("Could not find any dro on index {}", arg);
+                println!("there is no dro on index {}.", arg);
                 return;
             }
         }
 
         match db::mark_todo_as_done(description) {
-            Ok(()) => println!("Updated dro on index {} successfully.", arg),
-            Err(error) => println!("Could not update dro at porsition {}: {}", arg, error),
+            Ok(()) => println!("dro on index {} updated.", arg),
+            Err(error) => println!("could not update dro at porsition {}: {}", arg, error),
         }
     }
 
@@ -103,20 +103,20 @@ impl Session {
         match &todos.get(arg) {
             Some(todo) => description = &todo.description,
             None => {
-                println!("Could not find any dro on index {}", arg);
+                println!("there is no dro on index {}.", arg);
                 return;
             }
         }
 
         match db::mark_todo_as_undone(description) {
-            Ok(()) => println!("Updated dro on index {} successfully.", arg),
-            Err(error) => println!("Could not update dro at porsition {}: {}", arg, error),
+            Ok(()) => println!("dro on index {} updated.", arg),
+            Err(error) => println!("could not update dro at porsition {}: {}", arg, error),
         }
     }
 
     fn purge_todos(&self) {
         db::purge_todos().expect("A problem occured while purging.");
-        println!("All done dro's were deleted successfully!");
+        println!("dros have been purged.");
     }
 
     fn show_help(&self) {
