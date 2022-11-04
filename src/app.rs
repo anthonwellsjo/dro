@@ -123,6 +123,17 @@ impl Session {
     }
 
     fn show_help(&self) {
-        todo!()
+        println!(
+        "
+            Command:        Argument:
+
+            v, view         -                   View all todos
+            a, add          description         Add new dro with <description>
+            md, markdone    index               Mark dro at position <index> as done
+            mu, markundone  index               Mark dro at position <index> as undone
+            pu, purge       -                   Deletes all dros that are marked as done
+            h, help         -                   See documentation
+        "
+        );
     }
 }
