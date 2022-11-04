@@ -6,6 +6,10 @@ license = "MIT OR Apache-2.0"
 description = "Super minimal CLI todo (dro) application."
 repository = "https://github.com/anthonwellsjo/dro"
 keywords = ["cli", "todo", "dro", "minimal", "bash_life"]
+include = [
+    "**/*.rs",
+    "Cargo.toml",
+]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
