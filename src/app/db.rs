@@ -99,15 +99,16 @@ pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
     Ok(to_do)
 }
 
-/// Deletes a todo to the database
+
+/// Marks todo as done
 /// # Arguments
-/// * `description` - The description that matches the todo that should be deleted
+/// * `description` - The description that matches todo that should get updated.
 /// # Examples
 /// ```
 /// use core::db::{ToDo, save_todo_to_db, delete_todo_from_db};
 /// let to_do = ToDo::new("Fix the bike wheel");
 /// let res = save_todo_to_db(to_do);
-/// delete_todo_from_db(&todo.description);
+/// mark_todo_as_done(&todo.description);
 /// ```
 pub fn delete_todo_from_db(description: &str) -> Result<()> {
     let conn = get_db_connection()?;
@@ -131,9 +132,17 @@ pub fn mark_todo_as_done(description: &str) -> Result<()> {
     Ok(())
 }
 
-/// Marks todo as done
+/// Marks todo as undone
 /// # Arguments
 /// * `description` - The description that matches todo that should get updated.
+/// # Examples
+/// ```
+/// use core::db::{ToDo, save_todo_to_db, delete_todo_from_db};
+/// let to_do = ToDo::new("Fix the bike wheel");
+/// let res = save_todo_to_db(to_do);
+/// mark_todo_as_done(&todo.description);
+/// mark_todo_as_undone(&todo.description);
+/// ```
 pub fn mark_todo_as_undone(description: &str) -> Result<()> {
     let conn = get_db_connection()?;
     conn.execute(
@@ -145,6 +154,17 @@ pub fn mark_todo_as_undone(description: &str) -> Result<()> {
     Ok(())
 }
 
+/// Marks all done todos as deleted - not destructive
+/// # Arguments
+/// * `description` - The description that matches todo that should get updated.
+/// # Examples
+/// ```
+/// use core::db::{ToDo, save_todo_to_db, delete_todo_from_db};
+/// let to_do = ToDo::new("Fix the bike wheel");
+/// let res = save_todo_to_db(to_do);
+/// mark_todo_as_done(&todo.description);
+/// purge_todos():
+/// ```
 pub fn purge_todos() -> Result<()> {
     let conn = get_db_connection()?;
     conn.execute(
