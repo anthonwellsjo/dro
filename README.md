@@ -1,5 +1,5 @@
 # dro
-###### An informal fork of i_do with a more ergonomic cli feel.
+###### super minimal cli todo (dro) application
 
 
 
