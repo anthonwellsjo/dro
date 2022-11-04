@@ -121,7 +121,7 @@ impl Session {
 
     fn show_help(&self) {
         println!(
-        "
+            "
             Command:        Argument:
 
             v, view         -                   View all todos
