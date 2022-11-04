@@ -45,6 +45,7 @@ impl Session {
             .expect("Error while getting the description for the todo.");
         let to_do = db::ToDo::new(description);
         db::save_todo_to_db(to_do).expect("A problem occured while saving to todo");
+        println!("dro added.");
     }
     pub fn run(&mut self) {
         let action = get_action(&self.args);
