@@ -1,6 +1,10 @@
 # dro
 ###### super minimal cli todo (dro) application
 
+often lurking in the terminal? just want to keep track of your daily tasks in a minimalist, straight forward manner?
+
+** dro ** is designed to be a intuitive and quick way to add notes of things to get done, directly from your favourite command line.
+
 
 
 
