@@ -158,13 +158,21 @@ pub fn purge_todos() -> Result<()> {
     Ok(())
 }
 
-/// Gets db-path which depends on wether we are running a test or not.
-fn get_db_path() -> &'static str {
+/// Gets db-path depending on environment and os
+fn get_db_path() -> String {
     if cfg!(test) {
-        &TEST_DB_PATH
+        String::from("./tests.sql")
     } else {
-        &DB_PATH
+        ensure_db_path_exists();
+        match dirs::home_dir() {
+            Some(dir) => String::from(dir.to_str().unwrap().to_owned() + "/dro/db.sql"),
+            None => panic!("Could not find a home directory"),
+        }
     }
+}
+
+fn ensure_db_path_exists() {
+    todo!()
 }
 
 #[cfg(test)]
