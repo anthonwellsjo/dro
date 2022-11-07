@@ -1,8 +1,5 @@
 use rusqlite::{Connection, Result};
 
-static TEST_DB_PATH: &str = "./tests.sql";
-static DB_PATH: &str = "./db.sql";
-
 pub struct ToDo {
     pub description: String,
     pub done: bool,
@@ -98,7 +95,6 @@ pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
 
     Ok(to_do)
 }
-
 
 /// Marks todo as done
 /// # Arguments
