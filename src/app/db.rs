@@ -152,10 +152,7 @@ pub fn mark_todo_as_undone(description: &str) -> Result<()> {
 /// ```
 pub fn purge_todos() -> Result<()> {
     let conn = get_db_connection()?;
-    conn.execute(
-        "UPDATE to_dos SET deleted=1 WHERE done=1",
-        []
-    )?;
+    conn.execute("UPDATE to_dos SET deleted=1 WHERE done=1", [])?;
     conn.close()
         .unwrap_or_else(|_| panic!("Panickin while closing conection."));
     Ok(())
