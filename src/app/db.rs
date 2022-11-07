@@ -178,7 +178,9 @@ fn ensure_db_path_exists() {
 #[cfg(test)]
 mod tests {
 
-    use super::{get_todos, save_todo_to_db, ToDo, TEST_DB_PATH};
+    use crate::app::db::get_db_path;
+
+    use super::{get_todos, save_todo_to_db, ToDo };
     use rand::Rng;
     use std::fs;
 
@@ -217,7 +219,7 @@ mod tests {
     #[ignore]
     fn cleanup_test_database() {
         fn remove_test_db() {
-            fs::remove_file(&TEST_DB_PATH)
+            fs::remove_file(get_db_path())
                 .unwrap_or_else(|err| panic!("Panicking while deleting test database: {}", err));
         }
         remove_test_db();
