@@ -1,4 +1,6 @@
+use dirs;
 use rusqlite::{Connection, Result};
+use std::fs;
 
 pub struct ToDo {
     pub description: String,
