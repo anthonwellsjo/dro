@@ -163,7 +163,7 @@ pub fn purge_todos() -> Result<()> {
 /// Gets db-path depending on environment and os. Creates path if not yet there.
 fn get_db_path() -> String {
     if cfg!(test) {
-        String::from("./tests.sql")
+        String::from("./test-db.sql")
     } else {
         ensure_db_path_exists();
         match dirs::home_dir() {
