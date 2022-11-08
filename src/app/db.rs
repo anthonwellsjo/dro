@@ -165,16 +165,11 @@ fn get_db_path() -> String {
     if cfg!(test) {
         String::from("./test-db.sql")
     } else {
-        ensure_db_path_exists();
         match dirs::home_dir() {
             Some(dir) => String::from(dir.to_str().unwrap().to_owned() + "/dro/db.sql"),
             None => panic!("Could not find a home directory"),
         }
     }
-}
-
-fn ensure_db_path_exists() {
-    todo!()
 }
 
 #[cfg(test)]
