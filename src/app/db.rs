@@ -160,7 +160,7 @@ pub fn purge_todos() -> Result<()> {
     Ok(())
 }
 
-/// Gets db-path depending on environment and os
+/// Gets db-path depending on environment and os. Creates path if not yet there.
 fn get_db_path() -> String {
     if cfg!(test) {
         String::from("./tests.sql")
