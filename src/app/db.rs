@@ -166,7 +166,11 @@ fn get_db_path() -> String {
         String::from("./test-db.sql")
     } else {
         match dirs::home_dir() {
-            Some(dir) => String::from(dir.to_str().unwrap().to_owned() + "/dro/db.sql"),
+            Some(dir) => {
+                let path = dir.to_str().unwrap().to_owned() + "/dro/";
+                fs::create_dir_all(&path).unwrap();
+                path + "db.sql"
+            }
             None => panic!("Could not find a home directory"),
         }
     }
@@ -177,7 +181,7 @@ mod tests {
 
     use crate::app::db::get_db_path;
 
-    use super::{get_todos, save_todo_to_db, ToDo };
+    use super::{get_todos, save_todo_to_db, ToDo};
     use rand::Rng;
     use std::fs;
 
