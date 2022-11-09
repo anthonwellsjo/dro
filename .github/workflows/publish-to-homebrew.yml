@@ -1,5 +1,5 @@
-name: Publish crate
-run-name: Publishing crate by @${{ github.actor }}
+name: Publish to homebrew
+run-name: Publishing by @${{ github.actor }}
 on:
   release:
   workflow_dispatch:
