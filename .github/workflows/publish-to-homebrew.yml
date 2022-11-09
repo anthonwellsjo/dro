@@ -20,8 +20,10 @@ jobs:
           override: true
 
       - name: Build binaries
-      - run: cargo build --release
+        run: cargo build --release
 
       - name: Run packaging script
         run: ./.github/scripts/package-homebrew-release.sh
         shell: bash
+        
+        
