@@ -2,10 +2,11 @@ name: Publish crate
 run-name: Publishing crate by @${{ github.actor }}
 on:
   release:
+  workflow_dispatch:
 
 jobs:
   publish:
-    name: Publish to cargo
+    name: Publish to homebrew
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
@@ -18,6 +19,9 @@ jobs:
           toolchain: stable
           override: true
 
-      - run: cargo publish --token ${CRATES_TOKEN}
-        env:
-          CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+      - name: Build binaries
+      - run: cargo build --release
+
+      - name: Run packaging script
+        run: ./.github/scripts/package-homebrew-release.sh
+        shell: bash
