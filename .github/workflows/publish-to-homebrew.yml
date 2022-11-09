@@ -23,7 +23,9 @@ jobs:
         run: cargo build --release
 
       - name: Run packaging script
-        run: ./.github/scripts/prepare-homebrew-package.sh
+        run: |
+         chmod +x ./.github/scripts/prepare-homebrew-package.sh
+         ./.github/scripts/prepare-homebrew-package.sh
         shell: bash
         
         
