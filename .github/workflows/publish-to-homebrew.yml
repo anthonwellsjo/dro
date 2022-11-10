@@ -34,7 +34,7 @@ jobs:
           APP_VERSION: 0.15
         with:
           repo_token: "${{ secrets.DRO_RELEASE_TOKEN }}"
-          automatic_release_tag: $APP_VERSION + "_HOMEBREW_RELEASE"
+          automatic_release_tag: "LATEST_HOMEBREW_RELEASE"
           prerelease: true
           files: 
             dro-mac.tar.gz
