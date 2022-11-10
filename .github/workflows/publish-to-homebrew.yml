@@ -33,7 +33,7 @@ jobs:
         id: get-version-job
         run: |
          chmod +x ./.github/scripts/get-version.sh
-         echo ./.github/scripts/get-version.sh >> $GITHUB_OUTPUT
+         echo ./.github/scripts/get-version.sh
         
       - name: Making release
         uses: "marvinpinto/action-automatic-releases@latest"
