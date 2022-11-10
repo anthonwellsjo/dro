@@ -1,5 +1,6 @@
 #! /bin/bash
 
 cd target/release
-tar -czf espanso-mac.tar.gz dro
+tar -czf dro-mac.tar.gz dro
+mv dro-mac.tar.gz ../../
 

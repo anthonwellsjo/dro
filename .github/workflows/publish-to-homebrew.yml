@@ -28,4 +28,13 @@ jobs:
          ./.github/scripts/prepare-homebrew-package.sh
         shell: bash
         
-        
+      - name: "tagged-release"
+        uses: "marvinpinto/action-automatic-releases@latest"
+        env:
+          APP_VERSION: 0.15
+        with:
+          repo_token: "${{ secrets.DRO_RELEASE_TOKEN }}"
+          automatic_release_tag: $APP_VERSION + "_HOMEBREW_RELEASE"
+          prerelease: true
+          files: 
+            dro-mac.tar.gz
