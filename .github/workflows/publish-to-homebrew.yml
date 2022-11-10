@@ -33,13 +33,14 @@ jobs:
         id: get-version-job
         run: |
          chmod +x ./.github/scripts/get-version.sh
-         ./.github/scripts/get-version.sh
+         echo ./.github/scripts/get-version.sh >> $GITHUB_OUTPUT
         
       - name: Making release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.DRO_RELEASE_TOKEN }}"
-          automatic_release_tag: "${{ steps.get-version-job.outputs.CURRENT_VERSION }}"
+          automatic_release_tag: "v${{ steps.get-version-job.outputs.CURRENT_VERSION }}"
+          title: "Homebrew release for v${{ steps.get-version-job.outputs.CURRENT_VERSION }}"
           prerelease: false
           files: 
             dro-mac.tar.gz
