@@ -1,2 +1,2 @@
 #! /bin/bash
-echo "CURRENT_VESION=0.1.5" >> $GITHUB_OUTPUT
+echo "CURRENT_VERSION=0.1.5" >> $GITHUB_OUTPUT
