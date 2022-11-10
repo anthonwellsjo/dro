@@ -3,7 +3,7 @@ run-name: Publishing by @${{ github.actor }}
 on:
   workflow_dispatch:
   release:
-    if: github.actor == 'anthonwellsjo'
+    if: github.actor == 'anthon'
 
 jobs:
   publish:
@@ -29,7 +29,7 @@ jobs:
          ./.github/scripts/prepare-homebrew-package.sh
         shell: bash
         
-      - name: "tagged-release"
+      - name: Making release
         uses: "marvinpinto/action-automatic-releases@latest"
         env:
           APP_VERSION: 0.15
