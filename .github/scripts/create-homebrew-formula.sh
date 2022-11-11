@@ -1,4 +1,5 @@
 #! /bin/bash
 
 cd Formula
-brew create --rust 
+version=$(./get-version.sh)
+brew create --rust "https://github.com/anthonwellsjo/dro/releases/tag/${version}"
