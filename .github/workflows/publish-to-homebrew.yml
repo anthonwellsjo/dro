@@ -20,20 +20,20 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Build binaries
-        run: cargo build --release
+      # - name: Build binaries
+      #   run: cargo build --release
 
-      - name: Run packaging script
-        run: |
-         chmod +x ./.github/scripts/prepare-homebrew-package.sh
-         ./.github/scripts/prepare-homebrew-package.sh
-        shell: bash
+      # - name: Run packaging script
+      #   run: |
+      #    chmod +x ./.github/scripts/prepare-homebrew-package.sh
+      #    ./.github/scripts/prepare-homebrew-package.sh
+      #   shell: bash
 
       - name: Get version
         id: get-version-job
         run: |
          chmod +x ./.github/scripts/get-version.sh
-         ./.github/scripts/get-version.sh 
+         echo ./.github/scripts/get-version.sh >> $GITHUB_OUTPUT
         
       - name: Making release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -44,3 +44,9 @@ jobs:
           prerelease: false
           files: 
             dro-mac.tar.gz
+
+      - name: Create formula
+        run: |
+         chmod +x ./.github/scripts/create-homebrew-formula.sh
+         ./.github/scripts/create-homebrew-formula.sh
+        shell: bash
