@@ -20,6 +20,10 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: Set up Homebrew
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
       # - name: Build binaries
       #   run: cargo build --release
 
@@ -46,27 +50,10 @@ jobs:
           files: 
             dro-mac.tar.gz
 
-      - name: Cache Homebrew Bundler RubyGems
-        id: cache
-        uses: actions/cache@v1
-        with:
-          path: ${{ steps.set-up-homebrew.outputs.gems-path }}
-          key: ${{ runner.os }}-rubygems-${{ steps.set-up-homebrew.outputs.gems-hash }}
-          restore-keys: ${{ runner.os }}-rubygems-
-
-      - name: Install Homebrew Bundler RubyGems
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Create formula
+        uses: Homebrew/actions/setup-homebrew@master
         run: |
-          brew install-bundler-gems
           echo "${{ steps.packaging-script.outputs.sha256 }}"
           chmod +x ./.github/scripts/create-homebrew-formula.sh
           ./.github/scripts/create-homebrew-formula.sh
         shell: bash
-
-      # - name: Create formula
-      #   uses: Homebrew/actions/setup-homebrew@master
-      #   run: |
-      #     echo "${{ steps.packaging-script.outputs.sha256 }}"
-      #     chmod +x ./.github/scripts/create-homebrew-formula.sh
-      #     ./.github/scripts/create-homebrew-formula.sh
-      #   shell: bash
