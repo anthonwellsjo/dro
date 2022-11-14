@@ -51,7 +51,6 @@ jobs:
             dro-mac.tar.gz
 
       - name: Create formula
-        uses: Homebrew/actions/setup-homebrew@master
         run: |
           echo "${{ steps.packaging-script.outputs.sha256 }}"
           chmod +x ./.github/scripts/create-homebrew-formula.sh
