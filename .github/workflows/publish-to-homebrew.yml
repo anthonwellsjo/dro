@@ -56,12 +56,17 @@ jobs:
 
       - name: Install Homebrew Bundler RubyGems
         if: steps.cache.outputs.cache-hit != 'true'
-        run: brew install-bundler-gems
-
-      - name: Create formula
-        uses: Homebrew/actions/setup-homebrew@master
         run: |
+          brew install-bundler-gems
           echo "${{ steps.packaging-script.outputs.sha256 }}"
           chmod +x ./.github/scripts/create-homebrew-formula.sh
           ./.github/scripts/create-homebrew-formula.sh
         shell: bash
+
+      # - name: Create formula
+      #   uses: Homebrew/actions/setup-homebrew@master
+      #   run: |
+      #     echo "${{ steps.packaging-script.outputs.sha256 }}"
+      #     chmod +x ./.github/scripts/create-homebrew-formula.sh
+      #     ./.github/scripts/create-homebrew-formula.sh
+      #   shell: bash
