@@ -1,7 +1,6 @@
 #! /bin/bash
 
-ver="$(sh get-version.sh)"
+version="$(sh get-version.sh | cut -d "=" -f 2)"
 cd .github/scripts
-version=${ver.CURRENT_VERSION}
 cd ../../Formula
 brew create --rust "https://github.com/anthonwellsjo/dro/releases/tag/${version}"
