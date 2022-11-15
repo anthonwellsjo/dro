@@ -24,8 +24,8 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      # - name: Build binaries
-      #   run: cargo build --release
+      - name: Build binaries
+        run: cargo build --release
 
       - name: Run packaging script
         id: packaging-script
