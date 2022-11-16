@@ -50,9 +50,20 @@ jobs:
           files: 
             dro-mac.tar.gz
 
-      - name: Create formula
+
+      - name: Bump Brew
+        env: 
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.BREW_TOKEN }}
         run: |
-          echo "${{ steps.packaging-script.outputs.sha256 }}"
-          chmod +x ./.github/scripts/create-homebrew-formula.sh
-          ./.github/scripts/create-homebrew-formula.sh
-        shell: bash
+          brew tap extrawurst/tap
+          brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
+          --sha256=${{ steps.shasum.outputs.sha }} \
+          --url="https://github.com/anthonwellsjo/dro/releases/download/${{ steps.get-version-job.outputs.CURRENT_VERSION }}/dro-mac.tar.gz" \
+          extrawurst/tap/gitui
+
+      # - name: Create formula
+      #   run: |
+      #     echo "${{ steps.packaging-script.outputs.sha256 }}"
+      #     chmod +x ./.github/scripts/create-homebrew-formula.sh
+      #     ./.github/scripts/create-homebrew-formula.sh
+      #   shell: bash
