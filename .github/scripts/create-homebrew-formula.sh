@@ -1,6 +1,7 @@
 #! /bin/bash
 
 version="$(sh get-version.sh | cut -d "=" -f 2)"
+echo "this is the version ${version}";
 cd .github/scripts
 cd ../../Formula
 echo "Creating formula with this url: https://github.com/anthonwellsjo/dro/releases/tag/${version}"
