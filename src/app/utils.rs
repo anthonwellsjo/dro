@@ -37,6 +37,8 @@ pub fn get_md_or_mu_index_argument(args: &mut Vec<String>) -> Option<usize> {
 
 #[cfg(test)]
 mod tests {
+    use super::get_action;
+    use crate::app::{utils::get_argument, Action};
 
     #[test]
     fn get_action_from_args() {
