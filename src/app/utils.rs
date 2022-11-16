@@ -42,10 +42,18 @@ mod tests {
 
     #[test]
     fn get_action_from_args() {
-        todo!()
+        let args: Vec<String> = vec!["md".to_string()];
+        let action = get_action(&args);
+        println!("{:?}", action);
+        assert_eq!(action, Action::MarkAsDone);
     }
+
     #[test]
     fn get_argument_from_args() {
-        todo!()
+        let desc = String::from("this is an argument");
+        let mut args: Vec<String> = vec!["md".to_string(), desc.clone()];
+        let argument = get_argument(&mut args).unwrap();
+        println!("{:?}", argument);
+        assert_eq!(argument, desc);
     }
 }
