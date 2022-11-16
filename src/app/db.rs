@@ -188,7 +188,15 @@ mod tests {
 
     #[test]
     fn grab_todos() {
-        todo!()
+        cleanup_test_database();
+        let descs = vec!["one", "two", "three"];
+        for desc in descs.iter() {
+            let to_do = ToDo::new(desc);
+            save_todo_to_db(to_do).unwrap();
+        }
+        let todos_from_db = get_todos().unwrap();
+        let mut descs_from_db = todos_from_db.iter().map(|todo| -> &str {&todo.description});
+        assert!(descs_from_db.all(|item| descs.contains(&item)));
     }
 
     #[test]
