@@ -5,7 +5,7 @@ use self::utils::get_argument;
 mod db;
 pub mod utils;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Action {
     View,
     Add,
