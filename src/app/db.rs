@@ -193,7 +193,9 @@ mod tests {
             save_todo_to_db(to_do).unwrap();
         }
         let todos_from_db = get_todos().unwrap();
-        let mut descs_from_db = todos_from_db.iter().map(|todo| -> &str {&todo.description});
+        let mut descs_from_db = todos_from_db
+            .iter()
+            .map(|todo| -> &str { &todo.description });
         assert!(descs_from_db.all(|item| descs.contains(&item)));
     }
 
@@ -219,8 +221,31 @@ mod tests {
     }
 
     #[test]
-    fn mark_todo_as_done() {
-        todo!()
+    fn mark_as_done() {
+        cleanup_test_database();
+        let description = TestUtils::create_rnd_string();
+        let to_do = ToDo::new(&description);
+        save_todo_to_db(to_do).unwrap();
+        mark_todo_as_done(&description).unwrap();
+        let todos = get_todos().unwrap();
+        let todo: &ToDo = todos.iter().nth(0).unwrap();
+        assert_eq!(todo.done, true);
+    }
+
+    #[test]
+    fn mark_as_undone() {
+        cleanup_test_database();
+        let description = TestUtils::create_rnd_string();
+        let to_do = ToDo::new(&description);
+        save_todo_to_db(to_do).unwrap();
+        mark_todo_as_done(&description).unwrap();
+        let todos_done = get_todos().unwrap();
+        let todo_done: &ToDo = todos_done.iter().nth(0).unwrap();
+        assert_eq!(todo_done.done, true);
+        mark_todo_as_undone(&description).unwrap();
+        let todos_undone = get_todos().unwrap();
+        let todo_undone: &ToDo = todos_undone.iter().nth(0).unwrap();
+        assert_eq!(todo_undone.done, false);
     }
 
     #[test]
