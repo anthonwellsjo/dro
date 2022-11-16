@@ -13,7 +13,7 @@ pub fn get_action(args: &Vec<String>) -> Action {
     .expect("Argument error! No action.")
 }
 pub fn get_argument(args: &mut Vec<String>) -> Option<&str> {
-    match args.get_mut(1) {
+    match args.get(1) {
         Some(x) => Some(x),
         None => {
             println!("Argument missing. Run `help` for documentation.");
@@ -22,7 +22,7 @@ pub fn get_argument(args: &mut Vec<String>) -> Option<&str> {
     }
 }
 pub fn get_md_or_mu_index_argument(args: &mut Vec<String>) -> Option<usize> {
-    match args.get_mut(1) {
+    match args.get(1) {
         Some(x) => Some(
             x.trim()
                 .parse()
