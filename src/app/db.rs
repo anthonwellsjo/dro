@@ -2,6 +2,7 @@ use dirs;
 use rusqlite::{Connection, Result};
 use std::fs;
 
+#[derive(Debug)]
 pub struct ToDo {
     pub description: String,
     pub done: bool,
