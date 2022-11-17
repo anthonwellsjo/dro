@@ -2,8 +2,8 @@ name: Publish to homebrew
 run-name: Publishing by @${{ github.actor }}
 on:
   workflow_dispatch:
-  push:
-    branches: [ $default-branch ]
+  # push:
+  #   branches: [ $default-branch ]
 
 jobs:
   publish:
