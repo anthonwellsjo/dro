@@ -56,7 +56,7 @@ jobs:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DRO_RELEASE_TOKEN }}
         run: |
           brew tap anthonwellsjo/tap
-          brew bump-formula-pr -f --version=${{ steps.get_version.outputs.version }} --no-browse --no-audit \
+          brew bump-formula-pr -f --version="${{ steps.get-version-job.outputs.CURRENT_VERSION }}" --no-browse --no-audit \
           --sha256=${{ steps.shasum.outputs.sha }} \
           --url="https://github.com/anthonwellsjo/dro/releases/download/${{ steps.get-version-job.outputs.CURRENT_VERSION }}/dro-mac.tar.gz" \
           anthonwellsjo/tap/dro
