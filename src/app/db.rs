@@ -179,8 +179,8 @@ fn get_db_path() -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::app::db::{get_db_path, mark_todo_as_undone};
     use super::{get_todos, mark_todo_as_done, save_todo_to_db, ToDo};
+    use crate::app::db::{get_db_path, mark_todo_as_undone};
     use rand::Rng;
     use std::fs;
 
