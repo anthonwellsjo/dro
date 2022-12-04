@@ -55,8 +55,8 @@ jobs:
         env: 
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DRO_RELEASE_TOKEN }}
         run: |
-          git config --global user.email "anthonwellsjo@gmail.com"
-          git config --global user.name "anthonwellsjo"
+          git config --global user.email ${{ github.event.pusher.email }}
+          git config --global user.name ${{ github.actor }}
           brew tap anthonwellsjo/tap
           brew bump-formula-pr -f --version="${{ steps.get-version-job.outputs.CURRENT_VERSION }}" --no-browse --no-audit \
           --sha256=${{ steps.shasum.outputs.sha }} \
