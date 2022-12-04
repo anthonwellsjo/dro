@@ -36,14 +36,16 @@ jobs:
 
       - name: Get version
         id: get-version-job
-        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+        run: |
+          chmod +x ./.github/scripts/get-version.sh
+          ./.github/scripts/get-version.sh >> $GITHUB_OUTPUT
         
       - name: Making release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.DRO_RELEASE_TOKEN }}"
-          automatic_release_tag: "${{ steps.get-version-job.outputs.version }}"
-          title: "Homebrew release for ${{ steps.get-version-job.outputs.version }}"
+          automatic_release_tag: "${{ steps.get-version-job.outputs.CURRENT_VERSION }}"
+          title: "Homebrew release for ${{ steps.get-version-job.outputs.CURRENT_VERSION }}"
           prerelease: false
           files: 
             dro-mac.tar.gz
@@ -56,9 +58,9 @@ jobs:
           git config --global user.email anthonwellsjo@gmail.com
           git config --global user.name anthonwellsjo
           brew tap anthonwellsjo/tap
-          brew bump-formula-pr -f --version="${{ steps.get-version-job.outputs.version }}" --no-browse --no-audit \
+          brew bump-formula-pr -f --version="${{ steps.get-version-job.outputs.CURRENT_VERSION }}" --no-browse --no-audit \
           --sha256=${{ steps.shasum.outputs.sha }} \
-          --url="https://github.com/anthonwellsjo/dro/releases/download/${{ steps.get-version-job.outputs.version }}/dro-mac.tar.gz" \
+          --url="https://github.com/anthonwellsjo/dro/releases/download/${{ steps.get-version-job.outputs.CURRENT_VERSION }}/dro-mac.tar.gz" \
           anthonwellsjo/tap/dro
 
       # - name: Create formula
