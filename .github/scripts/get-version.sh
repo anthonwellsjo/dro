@@ -1,3 +1,5 @@
 #! /bin/bash
 
-echo "CURRENT_VERSION=v0.1.10"
+
+
+echo "CURRENT_VERSION=v0.1.11"
