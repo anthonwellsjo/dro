@@ -24,15 +24,15 @@ jobs:
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
 
-      # - name: Build binaries
-      #   run: cargo build --release
+      - name: Build binaries
+        run: cargo build --release
 
-      # - name: Run packaging script
-      #   id: packaging-script
-      #   run: |
-      #     chmod +x ./.github/scripts/prepare-homebrew-package.sh
-      #     ./.github/scripts/prepare-homebrew-package.sh
-      #   shell: bash
+      - name: Run packaging script
+        id: packaging-script
+        run: |
+          chmod +x ./.github/scripts/prepare-homebrew-package.sh
+          ./.github/scripts/prepare-homebrew-package.sh
+        shell: bash
 
       - name: Get version
         id: get-version-job

@@ -2,4 +2,4 @@
 
 
 
-echo "CURRENT_VERSION=v0.1.11"
+echo "CURRENT_VERSION=v0.1.12"
