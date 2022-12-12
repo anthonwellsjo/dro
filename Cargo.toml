@@ -16,6 +16,7 @@ include = [
 [dependencies]
 dirs = "4.0.0"
 rusqlite = "0.28.0"
+brr = { path = "../brr"}
 
 [dev-dependencies]
 rand = "0.8.5"

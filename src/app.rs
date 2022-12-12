@@ -1,9 +1,9 @@
-use crate::app::utils::{get_action, get_md_or_mu_index_argument};
+use crate::app::bash_driver::{get_action, get_md_or_mu_index_argument};
 
-use self::utils::get_argument;
+use self::bash_driver::get_argument;
 
 mod db;
-pub mod utils;
+pub mod bash_driver;
 
 #[derive(Debug, PartialEq)]
 pub enum Action {
@@ -18,37 +18,14 @@ pub enum Action {
 #[derive(Debug)]
 struct InputError;
 
-impl Action {
-    fn from_string(s: &str) -> Result<Action, InputError> {
-        match s {
-            "v" | "view" => Ok(Action::View),
-            "a" | "add" => Ok(Action::Add),
-            "md" | "markdone" => Ok(Action::MarkAsDone),
-            "mu" | "markundone" => Ok(Action::MarkAsUndone),
-            "pu" | "purge" => Ok(Action::Purge),
-            "h" | "help" => Ok(Action::Help),
-            _ => Err(InputError),
-        }
-    }
-}
 
 pub struct Session {
     args: Vec<String>,
 }
 
 impl Session {
-    pub fn new(args: Vec<String>) -> Self {
-        Session { args }
-    }
-    fn add_todo(&mut self) {
-        let description = get_argument(&mut self.args)
-            .expect("Error while getting the description for the todo.");
-        let to_do = db::ToDo::new(description);
-        db::save_todo_to_db(to_do).expect("A problem occured while saving to todo");
-        println!("dro added.");
-    }
-    pub fn run(&mut self) {
-        let action = get_action(&self.args);
+
+    pub fn run(action: Action, arugment: &str) {
         match action {
             Action::View => {
                 self.show_todos();
@@ -69,6 +46,14 @@ impl Session {
                 self.show_help();
             }
         }
+    }
+
+    fn add_todo(&mut self) {
+        let description = get_argument(&mut self.args)
+            .expect("Error while getting the description for the todo.");
+        let to_do = db::ToDo::new(description);
+        db::save_todo_to_db(to_do).expect("A problem occured while saving to todo");
+        println!("dro added.");
     }
 
     fn show_todos(&self) {

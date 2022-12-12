@@ -1,10 +1,6 @@
-use super::Action;
+use super::{Action, InputError};
 use std::process;
 
-pub fn get_args() -> Vec<String> {
-    let args: Vec<String> = std::env::args().collect();
-    args[1..].to_vec()
-}
 pub fn get_action(args: &Vec<String>) -> Action {
     Action::from_string(args.first().unwrap_or_else(|| {
         println!("Found no action. Run `help` for documentation.");
@@ -35,10 +31,24 @@ pub fn get_md_or_mu_index_argument(args: &mut Vec<String>) -> Option<usize> {
     }
 }
 
+impl Action {
+    fn from_string(s: &str) -> Result<Action, InputError> {
+        match s {
+            "v" | "view" => Ok(Action::View),
+            "a" | "add" => Ok(Action::Add),
+            "md" | "markdone" => Ok(Action::MarkAsDone),
+            "mu" | "markundone" => Ok(Action::MarkAsUndone),
+            "pu" | "purge" => Ok(Action::Purge),
+            "h" | "help" => Ok(Action::Help),
+            _ => Err(InputError),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::get_action;
-    use crate::app::{utils::get_argument, Action};
+    use crate::app::{bash_driver::get_argument, Action};
 
     #[test]
     fn get_action_from_args() {
