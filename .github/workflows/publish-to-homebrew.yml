@@ -61,7 +61,7 @@ jobs:
           brew bump-formula-pr -f --version="${{ steps.get-version-job.outputs.CURRENT_VERSION }}" --no-browse --no-audit \
           --sha256=${{ steps.shasum.outputs.sha }} \
           --url="https://github.com/anthonwellsjo/dro/releases/download/${{ steps.get-version-job.outputs.CURRENT_VERSION }}/dro-mac.tar.gz" \
-          anthonwellsjo/dro
+          anthonwellsjo/dro/dro
 
       # - name: Create formula
       #   run: |
