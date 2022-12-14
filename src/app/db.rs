@@ -2,8 +2,6 @@ use dirs;
 use rusqlite::{Connection, Result};
 use std::fs;
 
-use super::ActionResponseType;
-
 #[derive(Debug)]
 pub struct ToDo {
     pub description: String,
@@ -87,7 +85,7 @@ pub fn get_todos() -> Result<Vec<ToDo>> {
 /// let res = save_todo_to_db(to_do);
 /// assert_eq!(res, Ok(()));
 /// ```
-pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo, ActionResponseType> {
+pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
     let conn = get_db_connection()?;
 
     conn.execute(

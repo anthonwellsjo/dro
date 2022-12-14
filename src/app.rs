@@ -1,4 +1,5 @@
 use crate::app::bash_driver:: get_md_or_mu_index_argument;
+use self::db::ToDo;
 
 
 mod db;
@@ -16,13 +17,14 @@ pub enum Action {
 
 enum ActionResponseType {
     Error,
-    Success
+    Success,
 }
 
 
 struct ActionResponse<'a> {
-    text: &'a str,
-    res_type: ActionResponseType
+    message: &'a str,
+    res_type: ActionResponseType,
+    todo: Option<&'a ToDo>
 }
 
 #[derive(Debug)]
@@ -37,50 +39,57 @@ impl Session<'_> {
 
     pub fn new(self) -> Self {Session{action_responses: vec!{}}}
 
-    pub fn run(self, action: Action, argument: &str) -> ActionResponse {
+    pub fn run(self, action: Action, argument: &str) -> Vec<ActionResponse> {
         match action {
             Action::View => {
-                self.show_todos()
+                self.show_todos();
             }
             Action::Add => {
-                self.add_todo(action, argument)
+                self.add_todo(action, argument);
             }
             Action::MarkAsDone => {
-                self.mark_as_done()
+                self.mark_as_done();
             }
             Action::MarkAsUndone => {
-                self.mark_as_undone()
+                self.mark_as_undone();
             }
             Action::Purge => {
-                self.purge_todos()
+                self.purge_todos();
             }
             Action::Help => {
-                self.show_help()
+                self.show_help();
             }
         }
+
+    self.action_responses
     }
 
-    fn add_todo(&self, action: Action, argument: &str) -> ActionResponse {
-        let to_do = db::ToDo::new(argument);
-        db::save_todo_to_db(to_do).unwrap_or_else(|_|{
-            self.action_responses.push(ActionResponse { text:"a problem occured while saving to todo." , res_type: ActionResponseType::Error });
-            self.action_responses
+    fn add_todo(&self, action: Action, argument: &str) {
+        let todo = db::ToDo::new(argument);
+        match db::save_todo_to_db(todo) {
+            Ok(_) => (),
+            Err(_) => {
+            self.action_responses.push(ActionResponse { message:"database didn't want to save this todo" , res_type: ActionResponseType::Error, todo: None })
+        },
+        };
+        
+        self.action_responses.push(ActionResponse { message:"dro added" , res_type: ActionResponseType::Success, todo: Some(&todo) });
+    }
+
+    fn show_todos(&self) {
+        let todos = db::get_todos();
+
+        match todos {
+            Ok(todos) => {
+            for (index, todo) in todos.iter().enumerate(){
+                self.action_responses.push(ActionResponse { message: "" , res_type: ActionResponseType::Success, todo: Some(todo) })
+            }
         }
-        )
-        self.action_responses.push(ActionResponse { text:"dro added" , res_type: ActionResponseType::Success })
-
-        println!("dro added.");
-    }
-
-    fn show_todos(&self) -> ActionResponse {
-        let todos = db::get_todos().expect("Error while getting todos.");
-
-        for (index, todo) in todos.iter().enumerate() {
-            println!("{} {} {}", index, todo.show_as_check(), todo.description)
+            Err(_) => todo!(),
         }
     }
 
-    fn mark_as_done(&mut self) -> ActionResponse {
+    fn mark_as_done(&mut self) {
         let arg = get_md_or_mu_index_argument(&mut self.args).unwrap();
         let todos = db::get_todos().expect("Error while getting todos.");
         let description: &str;
@@ -92,13 +101,13 @@ impl Session<'_> {
             }
         }
 
-        match db::mark_todo_as_done(description) -> ActionResponse {
+        match db::mark_todo_as_done(description) {
             Ok(()) => println!("dro on index {} updated.", arg),
             Err(error) => println!("could not update dro at porsition {}: {}", arg, error),
         }
     }
 
-    fn mark_as_undone(&mut self) -> ActionResponse {
+    fn mark_as_undone(&mut self) {
         let arg = get_md_or_mu_index_argument(&mut self.args).unwrap();
         let todos = db::get_todos().expect("Error while getting todos.");
         let description: &str;
@@ -110,18 +119,18 @@ impl Session<'_> {
             }
         }
 
-        match db::mark_todo_as_undone(description) -> ActionResponse {
+        match db::mark_todo_as_undone(description) {
             Ok(()) => println!("dro on index {} updated.", arg),
             Err(error) => println!("could not update dro at porsition {}: {}", arg, error),
         }
     }
 
-    fn purge_todos(&self) -> ActionResponse {
+    fn purge_todos(&self) {
         db::purge_todos().expect("A problem occured while purging.");
         println!("dros have been purged.");
     }
 
-    fn show_help(&self) -> ActionResponse {
+    fn show_help(&self) {
         println!(
             "
             Command:        Argument:
