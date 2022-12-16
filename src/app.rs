@@ -45,10 +45,10 @@ impl Session<'_> {
                 self.show_todos();
             }
             Action::Add => {
-                self.add_todo(action, argument);
+                self.add_todo(argument);
             }
             Action::MarkAsDone => {
-                self.mark_as_done();
+                self.mark_as_done(argument);
             }
             Action::MarkAsUndone => {
                 self.mark_as_undone();
@@ -64,7 +64,7 @@ impl Session<'_> {
     self.action_responses
     }
 
-    fn add_todo(&self, action: Action, argument: &str) {
+    fn add_todo(&self, argument: &str) {
         let todo = db::ToDo::new(argument);
         match db::save_todo_to_db(todo) {
             Ok(_) => (),
@@ -82,29 +82,37 @@ impl Session<'_> {
         match todos {
             Ok(todos) => {
             for (index, todo) in todos.iter().enumerate(){
-                self.action_responses.push(ActionResponse { message: "" , res_type: ActionResponseType::Success, todo: Some(todo) })
+                self.action_responses.push(ActionResponse { message: "" , res_type: ActionResponseType::Success, todo: Some(todo) });
             }
         }
             Err(_) => todo!(),
         }
     }
 
-    fn mark_as_done(&mut self) {
-        let arg = get_md_or_mu_index_argument(&mut self.args).unwrap();
-        let todos = db::get_todos().expect("Error while getting todos.");
-        let description: &str;
-        match &todos.get(arg) {
-            Some(todo) => description = &todo.description,
+    fn mark_as_done(&mut self, arg: &str) {
+        let mut index: usize;
+        match arg.trim().parse::<usize>() {
+            Ok(i) => index=index,
+            Err(_) => {
+                self.action_responses.push(ActionResponse { message: "couldn't parse argument to index number", res_type: ActionResponseType::Error, todo: None });
+                return;
+            },
+        }
+        let todos: Vec<ToDo> = db::get_todos().expect("fatal error while getting todos.");
+
+        let todo: &ToDo;
+
+        match &todos.get(index) {
+            Some(todo) => todo = &todo,
             None => {
                 println!("there is no dro on index {}.", arg);
+                self.action_responses.push(ActionResponse { message:&("there is no dro on index ".to_owned()+&arg) , res_type: ActionResponseType::Error, todo: None });
                 return;
-            }
+           }
         }
 
-        match db::mark_todo_as_done(description) {
-            Ok(()) => println!("dro on index {} updated.", arg),
-            Err(error) => println!("could not update dro at porsition {}: {}", arg, error),
-        }
+        db::mark_todo_as_done(&todo.description).expect(&("could not update dro at porsition ".to_owned() + &arg)); 
+        self.action_responses.push(ActionResponse { message: &("dro on index ".to_owned() + &arg + " updated."), res_type: ActionResponseType::Success, todo: Some(todo) })
     }
 
     fn mark_as_undone(&mut self) {
