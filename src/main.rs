@@ -2,10 +2,10 @@ mod app;
 use brr::get_args;
 
 fn main() {
-    let args = get_args();
+    let mut args = get_args();
     let action = app::bash_driver::get_action(&args);
-    let arguments = app::bash_driver::get_argument(&mut args);
+    let arguments = app::bash_driver::get_argument(&mut args).expect("E");
 
-    let mut app = app::Session::run(action);
-    app.run();
+    let app = app::Session::new(); 
+    app.run(action, arguments);
 }
