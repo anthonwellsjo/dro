@@ -13,12 +13,14 @@ pub enum Action {
     Help,
 }
 
+#[derive(Debug)]
 enum ActionResponseType {
     Error,
     Success,
 }
 
-struct ActionResponse<'a> {
+#[derive(Debug)]
+pub struct ActionResponse<'a> {
     message: &'a str,
     res_type: ActionResponseType,
     todo: Option<ToDo>,
@@ -38,25 +40,60 @@ impl Session<'_> {
         }
     }
 
-    pub fn run(&self, action: Action, argument: &str) -> &Vec<ActionResponse> {
+    pub fn run(&mut self, action: Action, argument: Option<&str>) -> &Vec<ActionResponse> {
         match action {
             Action::View => {
                 self.show_todos();
-            }
-            Action::Add => {
-                self.add_todo(argument);
-            }
-            Action::MarkAsDone => {
-                self.mark_as_done(argument);
-            }
-            Action::MarkAsUndone => {
-                self.mark_as_undone(argument);
             }
             Action::Purge => {
                 self.purge_todos();
             }
             Action::Help => {
                 self.show_help();
+            }
+
+            // todo: make wrapper for all actions that need arg
+            Action::Add => {
+                match argument {
+                    Some(arg) => {
+                        self.add_todo(arg);
+                    }
+                    None => {
+                        self.action_responses.push(ActionResponse {
+                            message: "this action requires an argument.",
+                            res_type: ActionResponseType::Error,
+                            todo: None,
+                        });
+                    }
+                };
+            }
+            Action::MarkAsDone => {
+                match argument {
+                    Some(arg) => {
+                        self.mark_as_done(arg);
+                    }
+                    None => {
+                        self.action_responses.push(ActionResponse {
+                            message: "this action requires an argument.",
+                            res_type: ActionResponseType::Error,
+                            todo: None,
+                        });
+                    }
+                };
+            }
+            Action::MarkAsUndone => {
+                match argument {
+                    Some(arg) => {
+                        self.mark_as_undone(arg);
+                    }
+                    None => {
+                        self.action_responses.push(ActionResponse {
+                            message: "this action requires an argument.",
+                            res_type: ActionResponseType::Error,
+                            todo: None,
+                        });
+                    }
+                };
             }
         }
 
@@ -74,14 +111,14 @@ impl Session<'_> {
             }),
         };
 
-        &self.action_responses.push(ActionResponse {
+        self.action_responses.push(ActionResponse {
             message: "dro added",
             res_type: ActionResponseType::Success,
             todo: Some(todo),
         });
     }
 
-    fn show_todos(&self) {
+    fn show_todos(&mut self) {
         let todos = db::get_todos();
 
         match todos {
@@ -98,7 +135,7 @@ impl Session<'_> {
         }
     }
 
-    fn get_index_from_arg(&self, arg: &str) -> Option<usize> {
+    fn get_index_from_arg(&mut self, arg: &str) -> Option<usize> {
         match arg.trim().parse::<usize>() {
             Ok(i) => Some(i),
             Err(_) => {
@@ -112,12 +149,12 @@ impl Session<'_> {
         }
     }
 
-    fn get_todo_from_index(&self, index: usize, todos: Vec<ToDo>) -> Option<ToDo> {
-        match todos.into_iter().nth(index) {
+    fn get_todo_from_index(&mut self, index: &usize, todos: Vec<ToDo>) -> Option<ToDo> {
+        match todos.into_iter().nth(*index) {
             Some(todo) => Some(todo),
             None => {
                 self.action_responses.push(ActionResponse {
-                    message: &("there is no dro on index ".to_owned() + &index.to_string()),
+                    message: "there is no dro on that index",
                     res_type: ActionResponseType::Error,
                     todo: None,
                 });
@@ -126,37 +163,37 @@ impl Session<'_> {
         }
     }
 
-    fn mark_as_done(&self, arg: &str) -> Option<()> {
-        let mut index: usize = self.get_index_from_arg(arg)?;
+    fn mark_as_done(&mut self, arg: &str) -> Option<()> {
+        let index: &usize = &self.get_index_from_arg(arg)?;
         let todos: Vec<ToDo> = db::get_todos().expect("fatal error while getting todos.");
         let todo: ToDo = self.get_todo_from_index(index, todos)?;
 
         db::mark_todo_as_done(&todo.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
-            message: &("dro on index ".to_owned() + &arg + " updated."),
+            message: "dro updated",
             res_type: ActionResponseType::Success,
             todo: Some(todo),
         });
         Some(())
     }
 
-    fn mark_as_undone(&self, arg: &str) -> Option<()> {
-        let mut index: usize = self.get_index_from_arg(arg)?;
+    fn mark_as_undone(&mut self, arg: &str) -> Option<()> {
+        let index: usize = self.get_index_from_arg(arg)?;
         let todos: Vec<ToDo> = db::get_todos().expect("fatal error while getting todos.");
-        let todo: &ToDo = self.get_todo_from_index(index, todos)?;
+        let todo = self.get_todo_from_index(&index, todos)?;
 
         db::mark_todo_as_undone(&todo.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
-            message: &("dro on index ".to_owned() + &arg + " updated."),
+            message: "dro updated",
             res_type: ActionResponseType::Success,
             todo: Some(todo),
         });
         Some(())
     }
 
-    fn purge_todos(&self) {
+    fn purge_todos(&mut self) {
         db::purge_todos().expect("A problem occured while purging.");
         self.action_responses.push(ActionResponse {
             message: "dros have been purged.",
@@ -165,7 +202,7 @@ impl Session<'_> {
         });
     }
 
-    fn show_help(&self) {
+    fn show_help(&mut self) {
         self.action_responses.push(ActionResponse {
             message: "
             Command:        Argument:
@@ -182,3 +219,4 @@ impl Session<'_> {
         });
     }
 }
+

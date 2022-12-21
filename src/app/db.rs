@@ -85,7 +85,7 @@ pub fn get_todos() -> Result<Vec<ToDo>> {
 /// let res = save_todo_to_db(to_do);
 /// assert_eq!(res, Ok(()));
 /// ```
-pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
+pub fn save_todo_to_db(to_do: &ToDo) -> Result<()> {
     let conn = get_db_connection()?;
 
     conn.execute(
@@ -96,7 +96,7 @@ pub fn save_todo_to_db(to_do: ToDo) -> Result<ToDo> {
     conn.close()
         .unwrap_or_else(|_| panic!("Panicking while closing conection."));
 
-    Ok(to_do)
+    Ok(())
 }
 
 /// Marks todo as done
@@ -190,7 +190,7 @@ mod tests {
         let descs = vec!["one", "two", "three"];
         for desc in descs.iter() {
             let to_do = ToDo::new(desc);
-            save_todo_to_db(to_do).unwrap();
+            save_todo_to_db(&to_do).unwrap();
         }
         let todos_from_db = get_todos().unwrap();
         let mut descs_from_db = todos_from_db
@@ -203,7 +203,7 @@ mod tests {
     fn save_a_todo() {
         let description = "Test description";
         let to_do = ToDo::new(description);
-        let res = save_todo_to_db(to_do).unwrap();
+        let res = save_todo_to_db(&to_do).unwrap();
         assert_eq!(&res.description, description);
     }
 

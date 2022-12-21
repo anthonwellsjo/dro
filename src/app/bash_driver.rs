@@ -11,26 +11,9 @@ pub fn get_action(args: &Vec<String>) -> Action {
 pub fn get_argument(args: &mut Vec<String>) -> Option<&str> {
     match args.get(1) {
         Some(x) => Some(x),
-        None => {
-            println!("Argument missing. Run `help` for documentation.");
-            process::exit(1)
-        }
+        None => None,
     }
 }
-pub fn get_md_or_mu_index_argument(args: &mut Vec<String>) -> Option<usize> {
-    match args.get(1) {
-        Some(x) => Some(
-            x.trim()
-                .parse()
-                .expect("Expected a number as second argument."),
-        ),
-        None => {
-            println!("Argument missing. Run `help` for documentation.");
-            process::exit(1)
-        }
-    }
-}
-
 impl Action {
     fn from_string(s: &str) -> Result<Action, InputError> {
         match s {
