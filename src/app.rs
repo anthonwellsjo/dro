@@ -21,7 +21,7 @@ enum ActionResponseType {
 struct ActionResponse<'a> {
     message: &'a str,
     res_type: ActionResponseType,
-    todo: Option<&'a ToDo>,
+    todo: Option<ToDo>,
 }
 
 #[derive(Debug)]
@@ -63,21 +63,21 @@ impl Session<'_> {
         &self.action_responses
     }
 
-    fn add_todo(&self, argument: &str) {
+    fn add_todo(&mut self, argument: &str) {
         let todo = db::ToDo::new(argument);
-        match db::save_todo_to_db(todo) {
-            Ok(_) => (),
-            Err(_) => self.action_responses.push(ActionResponse {
+        match db::save_todo_to_db(&todo) {
+            Ok(_) => &(),
+            Err(_) => &self.action_responses.push(ActionResponse {
                 message: "database didn't want to save this todo",
                 res_type: ActionResponseType::Error,
                 todo: None,
             }),
         };
 
-        self.action_responses.push(ActionResponse {
+        &self.action_responses.push(ActionResponse {
             message: "dro added",
             res_type: ActionResponseType::Success,
-            todo: Some(&todo),
+            todo: Some(todo),
         });
     }
 
@@ -86,7 +86,7 @@ impl Session<'_> {
 
         match todos {
             Ok(todos) => {
-                for (index, todo) in todos.iter().enumerate() {
+                for (_, todo) in todos.into_iter().enumerate() {
                     self.action_responses.push(ActionResponse {
                         message: "",
                         res_type: ActionResponseType::Success,
@@ -112,8 +112,8 @@ impl Session<'_> {
         }
     }
 
-    fn get_todo_from_index(&self, index: usize, todos: &Vec<ToDo>) -> Option<&ToDo> {
-        match todos.get(index) {
+    fn get_todo_from_index(&self, index: usize, todos: Vec<ToDo>) -> Option<ToDo> {
+        match todos.into_iter().nth(index) {
             Some(todo) => Some(todo),
             None => {
                 self.action_responses.push(ActionResponse {
@@ -129,7 +129,7 @@ impl Session<'_> {
     fn mark_as_done(&self, arg: &str) -> Option<()> {
         let mut index: usize = self.get_index_from_arg(arg)?;
         let todos: Vec<ToDo> = db::get_todos().expect("fatal error while getting todos.");
-        let todo: &ToDo = self.get_todo_from_index(index, &todos)?;
+        let todo: ToDo = self.get_todo_from_index(index, todos)?;
 
         db::mark_todo_as_done(&todo.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
@@ -144,7 +144,7 @@ impl Session<'_> {
     fn mark_as_undone(&self, arg: &str) -> Option<()> {
         let mut index: usize = self.get_index_from_arg(arg)?;
         let todos: Vec<ToDo> = db::get_todos().expect("fatal error while getting todos.");
-        let todo: &ToDo = self.get_todo_from_index(index, &todos)?;
+        let todo: &ToDo = self.get_todo_from_index(index, todos)?;
 
         db::mark_todo_as_undone(&todo.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
