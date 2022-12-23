@@ -203,8 +203,9 @@ mod tests {
     fn save_a_todo() {
         let description = "Test description";
         let to_do = ToDo::new(description);
-        let res = save_todo_to_db(&to_do).unwrap();
-        assert_eq!(&res.description, description);
+        save_todo_to_db(&to_do).unwrap();
+        let to_dos = get_todos().unwrap();
+        assert_eq!(to_dos.iter().any(|i| i.description == description), true);
     }
 
     #[test]
@@ -213,8 +214,8 @@ mod tests {
         let description_two = TestUtils::create_rnd_string();
         let to_do = ToDo::new(&description);
         let to_do2 = ToDo::new(&description_two);
-        save_todo_to_db(to_do).unwrap();
-        save_todo_to_db(to_do2).unwrap();
+        save_todo_to_db(&to_do).unwrap();
+        save_todo_to_db(&to_do2).unwrap();
 
         let todos = get_todos().unwrap();
         assert!(&todos.iter().any(|x| x.description == description_two));
@@ -225,7 +226,7 @@ mod tests {
         cleanup_test_database();
         let description = TestUtils::create_rnd_string();
         let to_do = ToDo::new(&description);
-        save_todo_to_db(to_do).unwrap();
+        save_todo_to_db(&to_do).unwrap();
         mark_todo_as_done(&description).unwrap();
         let todos = get_todos().unwrap();
         let todo: &ToDo = todos.iter().nth(0).unwrap();
@@ -237,7 +238,7 @@ mod tests {
         cleanup_test_database();
         let description = TestUtils::create_rnd_string();
         let to_do = ToDo::new(&description);
-        save_todo_to_db(to_do).unwrap();
+        save_todo_to_db(&to_do).unwrap();
         mark_todo_as_done(&description).unwrap();
         let todos_done = get_todos().unwrap();
         let todo_done: &ToDo = todos_done.iter().nth(0).unwrap();
