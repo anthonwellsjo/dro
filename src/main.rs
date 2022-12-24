@@ -1,9 +1,18 @@
+use app::bash_driver::display_action_response;
+
 mod app;
 
-use app::utils::get_args;
-
 fn main() {
-    let args = get_args();
-    let mut app = app::Session::new(args);
-    app.run();
+    let action = brr::get_argument_at(0).unwrap();
+    let action = app::Action::from_string(&action);
+    let argument = brr::get_argument_at(1);
+
+    let mut session = app::Session::new(); 
+
+    session.run(action, argument);
+
+    for res in session.action_responses.iter(){
+        display_action_response(res);
+    }
+    
 }
