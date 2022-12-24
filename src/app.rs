@@ -11,26 +11,39 @@ pub enum Action {
     MarkAsUndone,
     Purge,
     Help,
+    Version,
 }
-
+impl Action {
+    pub fn from_string(s: &str) -> Option<Action> {
+        match s {
+            "s" | "see" => Some(Action::View),
+            "a" | "add" => Some(Action::Add),
+            "md" | "markdone" => Some(Action::MarkAsDone),
+            "mu" | "markundone" => Some(Action::MarkAsUndone),
+            "pu" | "purge" => Some(Action::Purge),
+            "h" | "help" => Some(Action::Help),
+            "v" | "version" => Some(Action::Version),
+            _ => None,
+        }
+    }
+}
 #[derive(Debug)]
-enum ActionResponseType {
+#[derive(PartialEq)]
+pub enum ActionResponseType {
     Error,
     Success,
+    Content
 }
 
 #[derive(Debug)]
 pub struct ActionResponse<'a> {
-    message: &'a str,
-    res_type: ActionResponseType,
-    todo: Option<ToDo>,
+    pub message: &'a str,
+    pub _type: ActionResponseType,
+    pub todo: Option<ToDo>,
 }
 
-#[derive(Debug)]
-struct InputError;
-
 pub struct Session<'a> {
-    action_responses: Vec<ActionResponse<'a>>,
+    pub action_responses: Vec<ActionResponse<'a>>,
 }
 
 impl Session<'_> {
@@ -40,64 +53,72 @@ impl Session<'_> {
         }
     }
 
-    pub fn run(&mut self, action: Action, argument: Option<&str>) -> &Vec<ActionResponse> {
+    pub fn run(&mut self, action: Option<Action>, argument: Option<String>) {
         match action {
-            Action::View => {
+            Some(Action::View) => {
                 self.show_todos();
             }
-            Action::Purge => {
+            Some(Action::Purge) => {
                 self.purge_todos();
             }
-            Action::Help => {
+            Some(Action::Help) => {
                 self.show_help();
+            }
+            Some(Action::Version) => {
+                self.show_version();
             }
 
             // todo: make wrapper for all actions that need arg
-            Action::Add => {
+            Some(Action::Add) => {
                 match argument {
                     Some(arg) => {
-                        self.add_todo(arg);
+                        self.add_todo(&arg);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
-                            res_type: ActionResponseType::Error,
+                            _type: ActionResponseType::Error,
                             todo: None,
                         });
                     }
                 };
             }
-            Action::MarkAsDone => {
+            Some(Action::MarkAsDone) => {
                 match argument {
                     Some(arg) => {
-                        self.mark_as_done(arg);
+                        self.mark_as_done(&arg);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
-                            res_type: ActionResponseType::Error,
+                            _type: ActionResponseType::Error,
                             todo: None,
                         });
                     }
                 };
             }
-            Action::MarkAsUndone => {
+            Some(Action::MarkAsUndone) => {
                 match argument {
                     Some(arg) => {
-                        self.mark_as_undone(arg);
+                        self.mark_as_undone(&arg);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
-                            res_type: ActionResponseType::Error,
+                            _type: ActionResponseType::Error,
                             todo: None,
                         });
                     }
                 };
+            }
+            None => {
+                self.action_responses.push(ActionResponse {
+                    message: "no action?",
+                    _type: ActionResponseType::Success,
+                    todo: None,
+                });
             }
         }
-
-        &self.action_responses
     }
 
     fn add_todo(&mut self, argument: &str) {
@@ -106,14 +127,14 @@ impl Session<'_> {
             Ok(_) => &(),
             Err(_) => &self.action_responses.push(ActionResponse {
                 message: "database didn't want to save this todo",
-                res_type: ActionResponseType::Error,
+                _type: ActionResponseType::Error,
                 todo: None,
             }),
         };
 
         self.action_responses.push(ActionResponse {
             message: "dro added",
-            res_type: ActionResponseType::Success,
+            _type: ActionResponseType::Success,
             todo: Some(todo),
         });
     }
@@ -126,7 +147,7 @@ impl Session<'_> {
                 for (_, todo) in todos.into_iter().enumerate() {
                     self.action_responses.push(ActionResponse {
                         message: "",
-                        res_type: ActionResponseType::Success,
+                        _type: ActionResponseType::Content,
                         todo: Some(todo),
                     });
                 }
@@ -141,7 +162,7 @@ impl Session<'_> {
             Err(_) => {
                 self.action_responses.push(ActionResponse {
                     message: "couldn't parse argument to index number",
-                    res_type: ActionResponseType::Error,
+                    _type: ActionResponseType::Error,
                     todo: None,
                 });
                 None
@@ -155,7 +176,7 @@ impl Session<'_> {
             None => {
                 self.action_responses.push(ActionResponse {
                     message: "there is no dro on that index",
-                    res_type: ActionResponseType::Error,
+                    _type: ActionResponseType::Error,
                     todo: None,
                 });
                 None
@@ -172,7 +193,7 @@ impl Session<'_> {
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
             message: "dro updated",
-            res_type: ActionResponseType::Success,
+            _type: ActionResponseType::Success,
             todo: Some(todo),
         });
         Some(())
@@ -187,7 +208,7 @@ impl Session<'_> {
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
             message: "dro updated",
-            res_type: ActionResponseType::Success,
+            _type: ActionResponseType::Success,
             todo: Some(todo),
         });
         Some(())
@@ -197,7 +218,7 @@ impl Session<'_> {
         db::purge_todos().expect("A problem occured while purging.");
         self.action_responses.push(ActionResponse {
             message: "dros have been purged.",
-            res_type: ActionResponseType::Success,
+            _type: ActionResponseType::Success,
             todo: None,
         });
     }
@@ -207,16 +228,24 @@ impl Session<'_> {
             message: "
             Command:        Argument:
 
-            v, view         -                   View all todos
+            s, see          -                   View all todos
             a, add          description         Add new dro with <description>
             md, markdone    index               Mark dro at position <index> as done
             mu, markundone  index               Mark dro at position <index> as undone
             pu, purge       -                   Deletes all dros that are marked as done
             h, help         -                   See documentation
+            v, version      -                   See current version
             ",
-            res_type: ActionResponseType::Success,
+            _type: ActionResponseType::Content,
+            todo: None,
+        });
+    }
+
+    fn show_version(&mut self) {
+        self.action_responses.push(ActionResponse {
+            message:  env!("CARGO_PKG_VERSION"),
+            _type: ActionResponseType::Content,
             todo: None,
         });
     }
 }
-

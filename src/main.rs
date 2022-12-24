@@ -1,15 +1,18 @@
+use app::bash_driver::display_action_response;
+
 mod app;
-use brr::get_args;
 
 fn main() {
-    let mut args = get_args();
-    let action = app::bash_driver::get_action(&args);
-    let arguments = app::bash_driver::get_argument(&mut args);
+    let action = brr::get_argument_at(0).unwrap();
+    let action = app::Action::from_string(&action);
+    let argument = brr::get_argument_at(1);
 
-    let mut app = app::Session::new(); 
-    let sprk = app.run(action, arguments);
-    for a_r in sprk.iter(){
-        println!("{:?}", a_r)
+    let mut session = app::Session::new(); 
+
+    session.run(action, argument);
+
+    for res in session.action_responses.iter(){
+        display_action_response(res);
     }
     
 }
