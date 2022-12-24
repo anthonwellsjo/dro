@@ -3,14 +3,14 @@ use rusqlite::{Connection, Result};
 use std::fs;
 
 #[derive(Debug)]
-pub struct ToDo {
+pub struct Dro {
     pub description: String,
     pub done: bool,
 }
 
-impl ToDo {
-    pub fn new(description: &str) -> ToDo {
-        ToDo {
+impl Dro {
+    pub fn new(description: &str) -> Dro {
+        Dro {
             description: description.to_owned(),
             done: false,
         }
@@ -34,13 +34,13 @@ pub fn get_db_connection() -> Result<Connection> {
     Ok(conn)
 }
 
-/// Gets all todos from the database
+/// Gets all dros from the database
 /// # Examples
 /// ```
-/// use core::db::get_todos;
-/// let res = get_todos();
+/// use core::db::get_dros;
+/// let res = get_dros();
 /// ```
-pub fn get_todos() -> Result<Vec<ToDo>> {
+pub fn get_dros() -> Result<Vec<Dro>> {
     let conn = get_db_connection()?;
 
     let mut stmt = conn.prepare(
@@ -49,17 +49,17 @@ pub fn get_todos() -> Result<Vec<ToDo>> {
          WHERE deleted=0",
     )?;
 
-    let to_dos = stmt.query_map([], |row| {
-        Ok(ToDo {
+    let dros = stmt.query_map([], |row| {
+        Ok(Dro {
             description: row.get(0)?,
             done: row.get(1)?,
         })
     })?;
 
-    let mut todiloes: Vec<ToDo> = Vec::new();
+    let mut todiloes: Vec<Dro> = Vec::new();
 
-    for todo in to_dos {
-        let greeting_file = match todo {
+    for dro in dros {
+        let greeting_file = match dro {
             Ok(file) => file,
             Err(error) => panic!("Problem opening the file: {:?}", error),
         };
@@ -69,17 +69,17 @@ pub fn get_todos() -> Result<Vec<ToDo>> {
     Ok(todiloes)
 }
 
-/// Saves a todo to the database
+/// Saves a dro to the database
 /// # Arguments
-/// * `to_do` - In instance of the ToDo struct that will be saved.
+/// * `to_do` - In instance of the dro struct that will be saved.
 /// # Examples
 /// ```
-/// use core::db::{ToDo, save_todo_to_db};
-/// let to_do = ToDo::new("Fix the bike wheel");
-/// let res = save_todo_to_db(to_do);
+/// use core::db::{Dro, save_dro_to_db};
+/// let to_do = Dro::new("Fix the bike wheel");
+/// let res = save_dro_to_db(to_do);
 /// assert_eq!(res, Ok(()));
 /// ```
-pub fn save_todo_to_db(to_do: &ToDo) -> Result<()> {
+pub fn save_dro_to_db(to_do: &Dro) -> Result<()> {
     let conn = get_db_connection()?;
 
     conn.execute(
@@ -93,17 +93,17 @@ pub fn save_todo_to_db(to_do: &ToDo) -> Result<()> {
     Ok(())
 }
 
-/// Marks todo as done
+/// Marks dro as done
 /// # Arguments
-/// * `description` - The description that matches todo that should get updated.
+/// * `description` - The description that matches dro that should get updated.
 /// # Examples
 /// ```
-/// use core::db::{ToDo, save_todo_to_db, delete_todo_from_db};
-/// let to_do = ToDo::new("Fix the bike wheel");
-/// let res = save_todo_to_db(to_do);
-/// mark_todo_as_done(&todo.description);
+/// use core::db::{Dro, save_dro_to_db, delete_dro_from_db};
+/// let to_do = Dro::new("Fix the bike wheel");
+/// let res = save_dro_to_db(to_do);
+/// mark_dro_as_done(&dro.description);
 /// ```
-pub fn mark_todo_as_done(description: &str) -> Result<()> {
+pub fn mark_dro_as_done(description: &str) -> Result<()> {
     let conn = get_db_connection()?;
     conn.execute(
         "UPDATE to_dos SET done=1 WHERE description=(?1)",
@@ -114,18 +114,18 @@ pub fn mark_todo_as_done(description: &str) -> Result<()> {
     Ok(())
 }
 
-/// Marks todo as undone
+/// Marks dro as undone
 /// # Arguments
-/// * `description` - The description that matches todo that should get updated.
+/// * `description` - The description that matches dro that should get updated.
 /// # Examples
 /// ```
-/// use core::db::{ToDo, save_todo_to_db, delete_todo_from_db};
-/// let to_do = ToDo::new("Fix the bike wheel");
-/// let res = save_todo_to_db(to_do);
-/// mark_todo_as_done(&todo.description);
-/// mark_todo_as_undone(&todo.description);
+/// use core::db::{Dro, save_dro_to_db, delete_dro_from_db};
+/// let to_do = Dro::new("Fix the bike wheel");
+/// let res = save_dro_to_db(to_do);
+/// mark_dro_as_done(&dro.description);
+/// mark_dro_as_undone(&dro.description);
 /// ```
-pub fn mark_todo_as_undone(description: &str) -> Result<()> {
+pub fn mark_dro_as_undone(description: &str) -> Result<()> {
     let conn = get_db_connection()?;
     conn.execute(
         "UPDATE to_dos SET done=0 WHERE description=(?1)",
@@ -136,18 +136,18 @@ pub fn mark_todo_as_undone(description: &str) -> Result<()> {
     Ok(())
 }
 
-/// Marks all done todos as deleted - not destructive
+/// Marks all done dros as deleted - not destructive
 /// # Arguments
-/// * `description` - The description that matches todo that should get updated.
+/// * `description` - The description that matches dro that should get updated.
 /// # Examples
 /// ```
-/// use core::db::{ToDo, save_todo_to_db, delete_todo_from_db};
-/// let to_do = ToDo::new("Fix the bike wheel");
-/// let res = save_todo_to_db(to_do);
-/// mark_todo_as_done(&todo.description);
-/// purge_todos():
+/// use core::db::{Dro, save_dro_to_db, delete_dro_from_db};
+/// let to_do = Dro::new("Fix the bike wheel");
+/// let res = save_dro_to_db(to_do);
+/// mark_dro_as_done(&dro.description);
+/// purge_dros():
 /// ```
-pub fn purge_todos() -> Result<()> {
+pub fn purge_dros() -> Result<()> {
     let conn = get_db_connection()?;
     conn.execute("UPDATE to_dos SET deleted=1 WHERE done=1", [])?;
     conn.close()
@@ -173,74 +173,74 @@ fn get_db_path() -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{get_todos, mark_todo_as_done, save_todo_to_db, ToDo};
-    use crate::app::db::{get_db_path, mark_todo_as_undone};
+    use super::{get_dros, mark_dro_as_done, save_dro_to_db, Dro};
+    use crate::app::db::{get_db_path, mark_dro_as_undone};
     use rand::Rng;
     use std::fs;
 
     #[test]
-    fn grab_todos() {
+    fn grab_dros() {
         cleanup_test_database();
         let descs = vec!["one", "two", "three"];
         for desc in descs.iter() {
-            let to_do = ToDo::new(desc);
-            save_todo_to_db(&to_do).unwrap();
+            let to_do = Dro::new(desc);
+            save_dro_to_db(&to_do).unwrap();
         }
-        let todos_from_db = get_todos().unwrap();
-        let mut descs_from_db = todos_from_db
+        let dros_from_db = get_dros().unwrap();
+        let mut descs_from_db = dros_from_db
             .iter()
-            .map(|todo| -> &str { &todo.description });
+            .map(|dro| -> &str { &dro.description });
         assert!(descs_from_db.all(|item| descs.contains(&item)));
     }
 
     #[test]
-    fn save_a_todo() {
+    fn save_a_dro() {
         let description = "Test description";
-        let to_do = ToDo::new(description);
-        save_todo_to_db(&to_do).unwrap();
-        let to_dos = get_todos().unwrap();
+        let to_do = Dro::new(description);
+        save_dro_to_db(&to_do).unwrap();
+        let to_dos = get_dros().unwrap();
         assert_eq!(to_dos.iter().any(|i| i.description == description), true);
     }
 
     #[test]
-    fn save_and_load_todos_from_db() {
+    fn save_and_load_dros_from_db() {
         let description = TestUtils::create_rnd_string();
         let description_two = TestUtils::create_rnd_string();
-        let to_do = ToDo::new(&description);
-        let to_do2 = ToDo::new(&description_two);
-        save_todo_to_db(&to_do).unwrap();
-        save_todo_to_db(&to_do2).unwrap();
+        let to_do = Dro::new(&description);
+        let to_do2 = Dro::new(&description_two);
+        save_dro_to_db(&to_do).unwrap();
+        save_dro_to_db(&to_do2).unwrap();
 
-        let todos = get_todos().unwrap();
-        assert!(&todos.iter().any(|x| x.description == description_two));
+        let dros = get_dros().unwrap();
+        assert!(&dros.iter().any(|x| x.description == description_two));
     }
 
     #[test]
     fn mark_as_done() {
         cleanup_test_database();
         let description = TestUtils::create_rnd_string();
-        let to_do = ToDo::new(&description);
-        save_todo_to_db(&to_do).unwrap();
-        mark_todo_as_done(&description).unwrap();
-        let todos = get_todos().unwrap();
-        let todo: &ToDo = todos.iter().nth(0).unwrap();
-        assert_eq!(todo.done, true);
+        let to_do = Dro::new(&description);
+        save_dro_to_db(&to_do).unwrap();
+        mark_dro_as_done(&description).unwrap();
+        let dros = get_dros().unwrap();
+        let dro: &Dro = dros.iter().nth(0).unwrap();
+        assert_eq!(dro.done, true);
     }
 
     #[test]
     fn mark_as_undone() {
         cleanup_test_database();
         let description = TestUtils::create_rnd_string();
-        let to_do = ToDo::new(&description);
-        save_todo_to_db(&to_do).unwrap();
-        mark_todo_as_done(&description).unwrap();
-        let todos_done = get_todos().unwrap();
-        let todo_done: &ToDo = todos_done.iter().nth(0).unwrap();
-        assert_eq!(todo_done.done, true);
-        mark_todo_as_undone(&description).unwrap();
-        let todos_undone = get_todos().unwrap();
-        let todo_undone: &ToDo = todos_undone.iter().nth(0).unwrap();
-        assert_eq!(todo_undone.done, false);
+        let to_do = Dro::new(&description);
+        save_dro_to_db(&to_do).unwrap();
+        mark_dro_as_done(&description).unwrap();
+        let dros_done = get_dros().unwrap();
+        let dro_done: &Dro = dros_done.iter().nth(0).unwrap();
+        assert_eq!(dro_done.done, true);
+        mark_dro_as_undone(&description).unwrap();
+        let dros_undone = get_dros().unwrap();
+        let dro_undone: &Dro = dros_undone.iter().nth(0).unwrap();
+        assert_eq!(dro_undone.done, false);
     }
 
     #[test]

@@ -1,4 +1,4 @@
-use self::db::ToDo;
+use self::db::Dro;
 
 pub mod bash_driver;
 mod db;
@@ -39,7 +39,7 @@ pub enum ActionResponseType {
 pub struct ActionResponse<'a> {
     pub message: &'a str,
     pub _type: ActionResponseType,
-    pub todo: Option<ToDo>,
+    pub dro: Option<Dro>,
 }
 
 pub struct Session<'a> {
@@ -56,10 +56,10 @@ impl Session<'_> {
     pub fn run(&mut self, action: Option<Action>, argument: Option<String>) {
         match action {
             Some(Action::View) => {
-                self.show_todos();
+                self.show_dros();
             }
             Some(Action::Purge) => {
-                self.purge_todos();
+                self.purge_dros();
             }
             Some(Action::Help) => {
                 self.show_help();
@@ -72,13 +72,13 @@ impl Session<'_> {
             Some(Action::Add) => {
                 match argument {
                     Some(arg) => {
-                        self.add_todo(&arg);
+                        self.add_dro(&arg);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
                             _type: ActionResponseType::Error,
-                            todo: None,
+                            dro: None,
                         });
                     }
                 };
@@ -92,7 +92,7 @@ impl Session<'_> {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
                             _type: ActionResponseType::Error,
-                            todo: None,
+                            dro: None,
                         });
                     }
                 };
@@ -106,7 +106,7 @@ impl Session<'_> {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
                             _type: ActionResponseType::Error,
-                            todo: None,
+                            dro: None,
                         });
                     }
                 };
@@ -115,40 +115,40 @@ impl Session<'_> {
                 self.action_responses.push(ActionResponse {
                     message: "no action?",
                     _type: ActionResponseType::Success,
-                    todo: None,
+                    dro: None,
                 });
             }
         }
     }
 
-    fn add_todo(&mut self, argument: &str) {
-        let todo = db::ToDo::new(argument);
-        match db::save_todo_to_db(&todo) {
+    fn add_dro(&mut self, argument: &str) {
+        let dro = db::Dro::new(argument);
+        match db::save_dro_to_db(&dro) {
             Ok(_) => &(),
             Err(_) => &self.action_responses.push(ActionResponse {
-                message: "database didn't want to save this todo",
+                message: "database didn't want to save this dro",
                 _type: ActionResponseType::Error,
-                todo: None,
+                dro: None,
             }),
         };
 
         self.action_responses.push(ActionResponse {
             message: "dro added",
             _type: ActionResponseType::Success,
-            todo: Some(todo),
+            dro: Some(dro),
         });
     }
 
-    fn show_todos(&mut self) {
-        let todos = db::get_todos();
+    fn show_dros(&mut self) {
+        let dros = db::get_dros();
 
-        match todos {
-            Ok(todos) => {
-                for (_, todo) in todos.into_iter().enumerate() {
+        match dros {
+            Ok(dros) => {
+                for (_, dro) in dros.into_iter().enumerate() {
                     self.action_responses.push(ActionResponse {
                         message: "",
                         _type: ActionResponseType::Content,
-                        todo: Some(todo),
+                        dro: Some(dro),
                     });
                 }
             }
@@ -163,21 +163,21 @@ impl Session<'_> {
                 self.action_responses.push(ActionResponse {
                     message: "couldn't parse argument to index number",
                     _type: ActionResponseType::Error,
-                    todo: None,
+                    dro: None,
                 });
                 None
             }
         }
     }
 
-    fn get_todo_from_index(&mut self, index: &usize, todos: Vec<ToDo>) -> Option<ToDo> {
-        match todos.into_iter().nth(*index) {
-            Some(todo) => Some(todo),
+    fn get_dro_from_index(&mut self, index: &usize, dros: Vec<Dro>) -> Option<Dro> {
+        match dros.into_iter().nth(*index) {
+            Some(dro) => Some(dro),
             None => {
                 self.action_responses.push(ActionResponse {
                     message: "there is no dro on that index",
                     _type: ActionResponseType::Error,
-                    todo: None,
+                    dro: None,
                 });
                 None
             }
@@ -186,40 +186,40 @@ impl Session<'_> {
 
     fn mark_as_done(&mut self, arg: &str) -> Option<()> {
         let index: &usize = &self.get_index_from_arg(arg)?;
-        let todos: Vec<ToDo> = db::get_todos().expect("fatal error while getting todos.");
-        let todo: ToDo = self.get_todo_from_index(index, todos)?;
+        let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
+        let dro: Dro = self.get_dro_from_index(index, dros)?;
 
-        db::mark_todo_as_done(&todo.description)
+        db::mark_dro_as_done(&dro.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            todo: Some(todo),
+            dro: Some(dro),
         });
         Some(())
     }
 
     fn mark_as_undone(&mut self, arg: &str) -> Option<()> {
         let index: usize = self.get_index_from_arg(arg)?;
-        let todos: Vec<ToDo> = db::get_todos().expect("fatal error while getting todos.");
-        let todo = self.get_todo_from_index(&index, todos)?;
+        let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
+        let dro = self.get_dro_from_index(&index, dros)?;
 
-        db::mark_todo_as_undone(&todo.description)
+        db::mark_dro_as_undone(&dro.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            todo: Some(todo),
+            dro: Some(dro),
         });
         Some(())
     }
 
-    fn purge_todos(&mut self) {
-        db::purge_todos().expect("A problem occured while purging.");
+    fn purge_dros(&mut self) {
+        db::purge_dros().expect("A problem occured while purging.");
         self.action_responses.push(ActionResponse {
             message: "dros have been purged.",
             _type: ActionResponseType::Success,
-            todo: None,
+            dro: None,
         });
     }
 
@@ -228,7 +228,7 @@ impl Session<'_> {
             message: "
             Command:        Argument:
 
-            s, see          -                   View all todos
+            s, see          -                   View all dros
             a, add          description         Add new dro with <description>
             md, markdone    index               Mark dro at position <index> as done
             mu, markundone  index               Mark dro at position <index> as undone
@@ -237,7 +237,7 @@ impl Session<'_> {
             v, version      -                   See current version
             ",
             _type: ActionResponseType::Content,
-            todo: None,
+            dro: None,
         });
     }
 
@@ -245,7 +245,7 @@ impl Session<'_> {
         self.action_responses.push(ActionResponse {
             message:  env!("CARGO_PKG_VERSION"),
             _type: ActionResponseType::Content,
-            todo: None,
+            dro: None,
         });
     }
 }

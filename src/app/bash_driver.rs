@@ -1,6 +1,6 @@
-use super::{db::ToDo, ActionResponse, ActionResponseType};
+use super::{db::Dro, ActionResponse, ActionResponseType};
 
-impl ToDo {
+impl Dro {
     pub fn show_as_check(&self) -> String {
         match &self.done {
             true => "☑".to_string(),
@@ -20,7 +20,7 @@ pub fn display_action_response(res: &ActionResponse) {
         println!("{}", res.message);
     }
     if res._type == ActionResponseType::Content {
-        match &res.todo {
+        match &res.dro {
             Some(t) => println!("{} {}", t.show_as_check(), t.description),
             None => {}
         }
