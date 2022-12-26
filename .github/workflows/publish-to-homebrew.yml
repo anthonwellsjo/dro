@@ -8,7 +8,7 @@ on:
 jobs:
   publish:
     name: Publish to homebrew
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
