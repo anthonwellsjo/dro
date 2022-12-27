@@ -31,7 +31,7 @@ jobs:
         id: get-version-job
         run: |
           chmod +x ./.github/scripts/get-version.sh
-          CURRENT_VERSION=$(./.github/scripts/get-version.sh ./Cargo.toml) >> $GITHUB_OUTPUT
+          echo "CURRENT_VERSION=$(./.github/scripts/get-version.sh ./Cargo.toml)" >> $GITHUB_OUTPUT
 
       - name: Run packaging script
         id: packaging-script
