@@ -27,18 +27,18 @@ jobs:
       - name: Build binaries
         run: cargo build --release
  
-      - name: Run packaging script
-        id: packaging-script
-        run: |
-          chmod +x ./.github/scripts/prepare-homebrew-package.sh
-          ./.github/scripts/prepare-homebrew-package.sh
-        shell: bash
-
       - name: Get version
         id: get-version-job
         run: |
           chmod +x ./.github/scripts/get-version.sh
           CURRENT_VERSION=$(./.github/scripts/get-version.sh ./Cargo.toml) >> $GITHUB_OUTPUT
+
+      - name: Run packaging script
+        id: packaging-script
+        run: |
+          chmod +x ./.github/scripts/prepare-homebrew-package.sh
+          ./.github/scripts/prepare-homebrew-package.sh "${{ steps.get-version-job.outputs.CURRENT_VERSION }}"
+        shell: bash
         
       - name: Making release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -61,10 +61,3 @@ jobs:
           --sha256=${{ steps.shasum.outputs.sha }} \
           --url="https://github.com/anthonwellsjo/dro/releases/download/${{ steps.get-version-job.outputs.CURRENT_VERSION }}/dro-mac.tar.gz" \
           anthonwellsjo/tap/dro
-
-      # - name: Create formula
-      #   run: |
-      #     echo "${{ steps.packaging-script.outputs.sha256 }}"
-      #     chmod +x ./.github/scripts/create-homebrew-formula.sh
-      #     ./.github/scripts/create-homebrew-formula.sh
-      #   shell: bash

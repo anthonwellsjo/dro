@@ -1,7 +1,11 @@
 #!/bin/bash
 
-chmod +x ./.github/scripts/get-version.sh
-filename = "dro-$(./.github/scripts/get-version.sh ../../Cargo.toml)-x86_64-apple-darwin.tar.gz"
+if [ $# -eq 0 ]; then
+  echo "Error: No version argument given."
+  exit 1
+fi
+
+filename="dro-$1-x86_64-apple-darwin.tar.gz"
 
 cd target/release
 tar -czf $filename dro
