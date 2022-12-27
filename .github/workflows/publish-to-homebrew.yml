@@ -38,7 +38,7 @@ jobs:
         id: get-version-job
         run: |
           chmod +x ./.github/scripts/get-version.sh
-          ./.github/scripts/get-version.sh >> $GITHUB_OUTPUT
+          CURRENT_VERSION=$(./.github/scripts/get-version.sh ./Cargo.toml) >> $GITHUB_OUTPUT
         
       - name: Making release
         uses: "marvinpinto/action-automatic-releases@latest"
@@ -49,7 +49,6 @@ jobs:
           prerelease: false
           files: 
             dro-mac.tar.gz
-
 
       - name: Bump Brew
         env: 
