@@ -1,6 +1,7 @@
 #!/bin/bash
 
-filename = "dro-$(./get-version.sh ../../Cargo.toml)-x86_64-apple-darwin.tar.gz"
+chmod +x ./.github/scripts/get-version.sh
+filename = "dro-$(./.github/scripts/get-version.sh ../../Cargo.toml)-x86_64-apple-darwin.tar.gz"
 
 cd target/release
 tar -czf $filename dro
