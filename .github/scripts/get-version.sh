@@ -12,4 +12,4 @@ fi
 version=$(grep '^version =' $1 | sed -E 's/^version *= *"([^"]+)"/\1/')
 
 # Print the extracted version value
-echo $version
+echo 'v{{$version}}'
