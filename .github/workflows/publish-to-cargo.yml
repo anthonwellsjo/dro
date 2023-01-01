@@ -2,8 +2,8 @@ name: Publish crate
 run-name: Publishing crate by @${{ github.actor }}
 on:
   workflow_dispatch:
-  # release:
-  #   branches: [ $default-branch ]
+  release:
+    branches: [ $default-branch ]
 
 jobs:
   publish:
