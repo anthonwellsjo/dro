@@ -14,6 +14,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "arw_brr"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1974600a8940a59e5cb196c815f128693960f6bff2b2b209cb0cdfc3479bc0db"
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -47,8 +53,9 @@ dependencies = [
 
 [[package]]
 name = "dro"
-version = "0.1.5"
+version = "0.2.2"
 dependencies = [
+ "arw_brr",
  "dirs",
  "rand",
  "rusqlite",

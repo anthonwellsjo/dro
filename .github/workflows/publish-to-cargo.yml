@@ -2,13 +2,13 @@ name: Publish crate
 run-name: Publishing crate by @${{ github.actor }}
 on:
   workflow_dispatch:
-  # release:
-  #   branches: [ $default-branch ]
+  push:
+    branches: [ $default-branch ]
 
 jobs:
   publish:
     name: Publish to cargo
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
