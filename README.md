@@ -1,4 +1,8 @@
-# dro
+     #
+  mmm#   m mm   mmm
+ #" "#   #"  " #" "#
+ #   #   #     #   #
+ "#m##   #     "#m#"
 ###### a super minimal cli todo (dro) application
 
 
@@ -9,11 +13,35 @@ often lurking in the terminal? just want to keep track of your daily tasks in a 
 **dro** is designed to be a intuitive and quick way to add notes of things to get done, directly from your favourite command line.
 
 
+### installation
+with homebrew:
+```
+brew install anthonwellsjo/tap/dro
+```
 
+or with cargo:
+```
+cargo install dro
+```
 
 ### docs
-![carbon](https://user-images.githubusercontent.com/58119759/199929774-af71eb4d-4b91-407c-a728-e00a49117532.png)
+```
+fn show_help(&mut self) {
+    self.action_responses.push(ActionResponse {
+        message: "
+        Command:        Argument:
 
+        s, see          -                   View all dros
+        a, add          description         Add new dro with <description>
+        md, markdone    index               Mark dro at position <index> as done
+        mu, markundone  index               Mark dro at position <index> as undone
+        pu, purge       -                   Deletes all dros that are marked as done
+        h, help         -                   See documentation
+        v, version      -                   See current version
+        ",
+        _type: ActionResponseType::Content,
+        dro: None,
+    });
+}
+```
 
-### installation
-![carbon (1)](https://user-images.githubusercontent.com/58119759/199958734-032ee7fb-0d72-414c-a280-de6927e89c22.png)
