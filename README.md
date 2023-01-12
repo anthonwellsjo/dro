@@ -1,8 +1,10 @@
+```
      #
   mmm#   m mm   mmm
  #" "#   #"  " #" "#
  #   #   #     #   #
  "#m##   #     "#m#"
+```
 ###### a super minimal cli todo (dro) application
 
 
