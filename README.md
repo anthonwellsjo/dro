@@ -28,27 +28,6 @@ cargo install dro
 
 ### docs
 ```
-<<<<<<< HEAD
-fn show_help(&mut self) {
-    self.action_responses.push(ActionResponse {
-        message: "
-        Command:        Argument:
-
-        s, see          -                   View all dros
-        a, add          description         Add new dro with <description>
-        md, markdone    index               Mark dro at position <index> as done
-        mu, markundone  index               Mark dro at position <index> as undone
-        pu, purge       -                   Deletes all dros that are marked as done
-        h, help         -                   See documentation
-        v, version      -                   See current version
-        ",
-        _type: ActionResponseType::Content,
-        dro: None,
-    });
-}
-```
-
-=======
 Command:        Argument:
 
 s, see          -                   View all dros
@@ -58,5 +37,5 @@ mu, markundone  index               Mark dro at position <index> as undone
 pu, purge       -                   Deletes all dros that are marked as done
 h, help         -                   See documentation
 v, version      -                   See current version
+
 ```
->>>>>>> dd4a440973ccfc3009406c2a7cdc4d31cb74b92e
