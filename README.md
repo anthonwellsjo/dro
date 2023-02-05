@@ -30,12 +30,12 @@ cargo install dro
 ```
 Command:        Argument:
 
-s, see          -                   View all dros
-a, add          description         Add new dro with <description>
-md, markdone    index               Mark dro at position <index> as done
-mu, markundone  index               Mark dro at position <index> as undone
-pu, purge       -                   Deletes all dros that are marked as done
-h, help         -                   See documentation
-v, version      -                   See current version
+s, see          -                   view all dros
+a, add          description         add new dro with <description>
+md, markdone    index               mark dro at position <index> as done
+mu, markundone  index               mark dro at position <index> as undone
+pu, purge       -                   deletes all dros that are marked as done
+h, help         -                   see documentation
+v, version      -                   see current version
 
 ```
