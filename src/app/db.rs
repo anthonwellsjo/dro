@@ -1,4 +1,4 @@
-use dirs;
+use arw_brr::get_app_path;
 use rusqlite::{Connection, Result};
 use std::fs;
 
@@ -20,7 +20,7 @@ impl Dro {
 ///  Gets connection to DB. This function will create a new DB if
 ///  not already present
 pub fn get_db_connection() -> Result<Connection> {
-    let conn = Connection::open(get_db_path())?;
+    let conn = Connection::open(get_app_path("dro"))?;
     conn.execute(
         "CREATE TABLE IF NOT EXISTS to_dos (
              id INTEGER PRIMARY KEY,
@@ -155,26 +155,11 @@ pub fn purge_dros() -> Result<()> {
     Ok(())
 }
 
-/// Gets db-path depending on environment and os. Creates path if not yet there.
-fn get_db_path() -> String {
-    if cfg!(test) {
-        String::from("./test-db.sql")
-    } else {
-        match dirs::home_dir() {
-            Some(dir) => {
-                let path = dir.to_str().unwrap().to_owned() + "/dro/";
-                fs::create_dir_all(&path).unwrap();
-                path + "db.sql"
-            }
-            None => panic!("Could not find a home directory"),
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::{get_dros, mark_dro_as_done, save_dro_to_db, Dro};
-    use crate::app::db::{get_db_path, mark_dro_as_undone};
+    use crate::app::db::{mark_dro_as_undone};
+    use arw_brr::get_app_path;
     use rand::Rng;
     use std::fs;
 
@@ -247,7 +232,7 @@ mod tests {
     #[ignore]
     fn cleanup_test_database() {
         fn remove_test_db() {
-            fs::remove_file(get_db_path())
+            fs::remove_file(get_app_path("dro"))
                 .unwrap_or_else(|err| panic!("Panicking while deleting test database: {}", err));
         }
         remove_test_db();

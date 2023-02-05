@@ -112,10 +112,9 @@ dependencies = [
 
 [[package]]
 name = "dro"
-version = "0.2.6"
+version = "0.2.8"
 dependencies = [
  "arw_brr",
- "dirs",
  "rand",
  "rusqlite",
 ]
