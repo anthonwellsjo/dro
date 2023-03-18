@@ -14,7 +14,8 @@ include = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-arw_brr = "0.1.4"
+arw_brr = {version = "0.1.4", path = "../arw_brr"}
+dirs = "4.0.0"
 rusqlite = "0.28.0"
 
 [dev-dependencies]

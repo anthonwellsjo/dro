@@ -158,7 +158,7 @@ pub fn purge_dros() -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::{get_dros, mark_dro_as_done, save_dro_to_db, Dro};
-    use crate::app::db::{mark_dro_as_undone};
+    use crate::app::db::mark_dro_as_undone;
     use arw_brr::get_app_path;
     use rand::Rng;
     use std::fs;
@@ -172,9 +172,7 @@ mod tests {
             save_dro_to_db(&to_do).unwrap();
         }
         let dros_from_db = get_dros().unwrap();
-        let mut descs_from_db = dros_from_db
-            .iter()
-            .map(|dro| -> &str { &dro.description });
+        let mut descs_from_db = dros_from_db.iter().map(|dro| -> &str { &dro.description });
         assert!(descs_from_db.all(|item| descs.contains(&item)));
     }
 
