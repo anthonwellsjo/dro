@@ -43,18 +43,18 @@ impl Opt {
 
 #[derive(Debug, PartialEq)]
 pub enum Flag {
-    Format,
+    Formatting,
 }
 impl Flag {
     pub fn from_string(s: &str) -> Option<Flag> {
         match s {
-            "-f" => Some(Flag::Format),
+            "-f" => Some(Flag::Formatting),
             _ => None,
         }
     }
     pub fn options(self: Self) -> Vec<Opt> {
         match self {
-            Flag::Format => vec![Opt::Day],
+            Flag::Formatting => vec![Opt::Day],
         }
     }
 }
@@ -71,10 +71,10 @@ pub enum Formatting {
 
 #[derive(Debug)]
 pub struct ActionResponse<'a> {
-    pub formatting: Option<Vec<Formatting>>,
+    pub formatting: Option<FlagWithOpts>,
     pub message: &'a str,
     pub _type: ActionResponseType,
-    pub dro: Option<Dro>,
+    pub dros: Option<Vec<Dro>>,
 }
 
 pub struct Session<'a> {
@@ -94,7 +94,8 @@ impl Session<'_> {
         argument: Option<String>,
         flags: Vec<Vec<String>>,
     ) {
-        let flags = self.parse_flags(flags);
+        let flags = self.parse_flags(&flags);
+
         match action {
             Some(Action::See) => {
                 self.show_dros(flags);
@@ -119,7 +120,7 @@ impl Session<'_> {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
                             _type: ActionResponseType::Error,
-                            dro: None,
+                            dros: None,
                             formatting: None,
                         });
                     }
@@ -134,7 +135,7 @@ impl Session<'_> {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
                             _type: ActionResponseType::Error,
-                            dro: None,
+                            dros: None,
                             formatting: None,
                         });
                     }
@@ -149,7 +150,7 @@ impl Session<'_> {
                         self.action_responses.push(ActionResponse {
                             message: "this action requires an argument.",
                             _type: ActionResponseType::Error,
-                            dro: None,
+                            dros: None,
                             formatting: None,
                         });
                     }
@@ -159,7 +160,7 @@ impl Session<'_> {
                 self.action_responses.push(ActionResponse {
                     message: "no action?",
                     _type: ActionResponseType::Success,
-                    dro: None,
+                    dros: None,
                     formatting: None,
                 });
             }
@@ -173,7 +174,7 @@ impl Session<'_> {
             Err(_) => &self.action_responses.push(ActionResponse {
                 message: "database didn't want to save this dro",
                 _type: ActionResponseType::Error,
-                dro: None,
+                dros: None,
                 formatting: None,
             }),
         };
@@ -181,24 +182,24 @@ impl Session<'_> {
         self.action_responses.push(ActionResponse {
             message: "dro added",
             _type: ActionResponseType::Success,
-            dro: Some(dro),
+            dros: Some(vec!(dro)),
             formatting: None,
         });
     }
 
-    fn show_dros(&mut self, flags: Vec<FlagWithOpts>) {
+    fn show_dros(&mut self, flags: Option<Vec<FlagWithOpts>>) {
         let dros = db::get_dros();
 
+
+        let formatting = get_formatting(flags);
         match dros {
             Ok(dros) => {
-                for (_, dro) in dros.into_iter().enumerate() {
-                    self.action_responses.push(ActionResponse {
-                        message: "",
-                        _type: ActionResponseType::Content,
-                        dro: Some(dro),
-                        formatting: None,
-                    });
-                }
+                self.action_responses.push(ActionResponse {
+                    message: "",
+                    _type: ActionResponseType::Content,
+                    dros: Some(dros),
+                    formatting
+                });
             }
             Err(_) => todo!(),
         }
@@ -211,7 +212,7 @@ impl Session<'_> {
                 self.action_responses.push(ActionResponse {
                     message: "couldn't parse argument to index number",
                     _type: ActionResponseType::Error,
-                    dro: None,
+                    dros: None,
                     formatting: None,
                 });
                 None
@@ -226,7 +227,7 @@ impl Session<'_> {
                 self.action_responses.push(ActionResponse {
                     message: "there is no dro on that index",
                     _type: ActionResponseType::Error,
-                    dro: None,
+                    dros: None,
                     formatting: None,
                 });
                 None
@@ -244,7 +245,7 @@ impl Session<'_> {
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            dro: Some(dro),
+            dros: Some(vec!(dro)),
             formatting: None,
         });
         Some(())
@@ -260,7 +261,7 @@ impl Session<'_> {
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            dro: Some(dro),
+            dros: Some(vec!(dro)),
             formatting: None,
         });
         Some(())
@@ -271,7 +272,7 @@ impl Session<'_> {
         self.action_responses.push(ActionResponse {
             message: "dros have been purged.",
             _type: ActionResponseType::Success,
-            dro: None,
+            dros: None,
             formatting: None,
         });
     }
@@ -290,7 +291,7 @@ impl Session<'_> {
             v, version      -                   See current version
             ",
             _type: ActionResponseType::Content,
-            dro: None,
+            dros: None,
             formatting: None,
         });
     }
@@ -299,27 +300,50 @@ impl Session<'_> {
         self.action_responses.push(ActionResponse {
             message: env!("CARGO_PKG_VERSION"),
             _type: ActionResponseType::Content,
-            dro: None,
+            dros: None,
             formatting: None,
         });
     }
 
-    fn parse_flags(&self, flags_with_opts: Vec<Vec<String>>) -> Vec<FlagWithOpts> {
+    fn parse_flags(&mut self, flags_with_opts: &Vec<Vec<String>>) -> Option<Vec<FlagWithOpts>> {
         let mut res: Vec<FlagWithOpts> = vec![];
-        for flag_with_opts in flags_with_opts.into_iter() {
+        for flag_with_opts in flags_with_opts.iter() {
+            let mut iter = flag_with_opts.into_iter();
             let mut fwo;
 
-            fwo = FlagWithOpts{flag: Flag::from_string(flag_with_opts.iter().next().unwrap()).unwrap(), opts: vec!()};
+            fwo = FlagWithOpts {
+                flag: Flag::from_string(iter.next().unwrap()).unwrap(),
+                opts: vec![],
+            };
 
-            for (index, item) in flag_with_opts.iter().enumerate() {
-                fwo.opts.push(Opt::from_string(item).unwrap());
+            for item in iter {
+                let opt = Opt::from_string(&item);
+                if opt.is_none() {
+                    self.action_responses.push(ActionResponse {
+                        formatting: None,
+                        message: "Unknown option ",
+                        _type: ActionResponseType::Error,
+                        dros: None,
+                    });
+                    continue;
+                };
+
+                fwo.opts.push(opt.unwrap());
             }
             res.push(fwo);
         }
-        res
+        Some(res)
     }
 }
 
+fn get_formatting(flags: Option<Vec<FlagWithOpts>>) -> Option<FlagWithOpts> {
+    if flags.is_none() {
+        return None;
+    }
+    flags.unwrap().into_iter().find(|f| f.flag == Flag::Formatting)
+}
+
+#[derive(Debug, PartialEq)]
 pub struct FlagWithOpts {
     pub flag: Flag,
     pub opts: Vec<Opt>,

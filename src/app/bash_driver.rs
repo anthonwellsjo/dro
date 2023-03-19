@@ -17,10 +17,13 @@ pub fn display_action_response(res: &ActionResponse) {
         print!("👍 ");
     }
     if res.message.len() > 0 {
-        println!("{}", res.message);
+        println!(" {}", res.message);
     }
     if res._type == ActionResponseType::Content {
-        match &res.dro {
+
+        if res.formatting.is_some() && res.formatting.unwrap().opts.into_iter().
+
+        match &res.dros {
             Some(t) => println!("{} {}", t.show_as_check(), t.description),
             None => {}
         }
