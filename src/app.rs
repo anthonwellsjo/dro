@@ -235,10 +235,16 @@ impl Session<'_> {
         }
     }
 
+    fn get_dro_from_query(&self, query: &str, dros: Vec<Dro>) -> Option<Dro> {
+        dros.into_iter().find(|dro| dro.description.contains(&query.to_string()))
+    }
+
     fn mark_as_done(&mut self, arg: &str) -> Option<()> {
-        let index: &usize = &self.get_index_from_arg(arg)?;
+        // commented code is for index selection instead of query
+        // let index: &usize = &self.get_index_from_arg(arg)?;
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
-        let dro: Dro = self.get_dro_from_index(index, dros)?;
+        // let dro: Dro = self.get_dro_from_index(index, dros)?;
+        let dro: Dro = self.get_dro_from_query(arg, dros)?;
 
         db::mark_dro_as_done(&dro.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
@@ -252,9 +258,11 @@ impl Session<'_> {
     }
 
     fn mark_as_undone(&mut self, arg: &str) -> Option<()> {
-        let index: usize = self.get_index_from_arg(arg)?;
+        // commented code is for index selection instead of query
+        // let index: usize = self.get_index_from_arg(arg)?;
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
-        let dro = self.get_dro_from_index(&index, dros)?;
+        // let dro = self.get_dro_from_index(&index, dros)?;
+        let dro: Dro = self.get_dro_from_query(arg, dros)?;
 
         db::mark_dro_as_undone(&dro.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
