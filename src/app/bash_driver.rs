@@ -1,4 +1,4 @@
-use super::{db::Dro, ActionResponse, ActionResponseType};
+use super::{db::Dro, ActionResponse, ActionResponseType, Opt};
 
 impl Dro {
     pub fn show_as_check(&self) -> String {
@@ -20,12 +20,23 @@ pub fn display_action_response(res: &ActionResponse) {
         println!(" {}", res.message);
     }
     if res._type == ActionResponseType::Content {
-
-        if res.formatting.is_some() && res.formatting.unwrap().opts.into_iter().
-
-        match &res.dros {
-            Some(t) => println!("{} {}", t.show_as_check(), t.description),
-            None => {}
+        if res.formatting.is_some() {
+            match res.formatting.as_ref().unwrap().opts.first().unwrap() {
+                Opt::Day => {
+                    for dro in res.dros.as_ref().unwrap().into_iter() {
+                        println!(
+                            "{} {} {}",
+                            dro.show_as_check(),
+                            dro.created.as_ref().unwrap(),
+                            dro.description
+                        )
+                    }
+                }
+            }
+        } else {
+            for dro in res.dros.as_ref().unwrap().into_iter() {
+                println!("{} {}", dro.show_as_check(), dro.description,)
+            }
         }
     }
 }

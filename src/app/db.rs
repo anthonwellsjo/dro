@@ -6,6 +6,7 @@ use std::fs;
 pub struct Dro {
     pub description: String,
     pub done: bool,
+    pub created: Option<String>
 }
 
 impl Dro {
@@ -13,6 +14,7 @@ impl Dro {
         Dro {
             description: description.to_owned(),
             done: false,
+            created: None
         }
     }
 }
@@ -44,7 +46,7 @@ pub fn get_dros() -> Result<Vec<Dro>> {
     let conn = get_db_connection()?;
 
     let mut stmt = conn.prepare(
-        "SELECT description, done
+        "SELECT description, done, created
          FROM to_dos 
          WHERE deleted=0",
     )?;
@@ -53,6 +55,7 @@ pub fn get_dros() -> Result<Vec<Dro>> {
         Ok(Dro {
             description: row.get(0)?,
             done: row.get(1)?,
+            created: row.get(2)?,
         })
     })?;
 

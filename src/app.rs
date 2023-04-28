@@ -16,7 +16,7 @@ pub enum Action {
 impl Action {
     pub fn from_string(s: &str) -> Option<Action> {
         match s {
-            "s" | "see" => Some(Action::See),
+            "s" | "l" | "see" => Some(Action::See),
             "a" | "add" => Some(Action::Add),
             "md" | "markdone" => Some(Action::MarkAsDone),
             "mu" | "markundone" => Some(Action::MarkAsUndone),
