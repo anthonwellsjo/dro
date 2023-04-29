@@ -31,11 +31,13 @@ impl Action {
 #[derive(Debug, PartialEq)]
 pub enum Opt {
     Day,
+    Index,
 }
 impl Opt {
     pub fn from_string(s: &str) -> Option<Opt> {
         match s {
             "day" => Some(Opt::Day),
+            "index" => Some(Opt::Index),
             _ => None,
         }
     }

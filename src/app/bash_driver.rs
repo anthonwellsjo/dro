@@ -20,23 +20,21 @@ pub fn display_action_response(res: &ActionResponse) {
         println!(" {}", res.message);
     }
     if res._type == ActionResponseType::Content {
-        if res.formatting.is_some() {
-            match res.formatting.as_ref().unwrap().opts.first().unwrap() {
-                Opt::Day => {
-                    for dro in res.dros.as_ref().unwrap().into_iter() {
-                        println!(
-                            "{} {} {}",
-                            dro.show_as_check(),
-                            dro.created.as_ref().unwrap(),
-                            dro.description
-                        )
+        for (index, dro) in res.dros.as_ref().unwrap().into_iter().enumerate() {
+            if res.formatting.is_some() {
+                let opts = &res.formatting.as_ref().unwrap().opts;
+                for opt in opts.into_iter() {
+                    match opt {
+                    Opt::Index => {
+                            print!("{} ", index)
+                        }
+                    Opt::Day => {
+                        print!("{} ", dro.created.as_ref().unwrap(),)
                     }
                 }
+                }
             }
-        } else {
-            for dro in res.dros.as_ref().unwrap().into_iter() {
-                println!("{} {}", dro.show_as_check(), dro.description,)
-            }
+            println!("{} {}", dro.show_as_check(), dro.description,)
         }
     }
 }
