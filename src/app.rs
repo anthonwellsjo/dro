@@ -32,31 +32,28 @@ impl Action {
 pub enum Opt {
     Day,
     Index,
-}
-impl Opt {
-    pub fn from_string(s: &str) -> Option<Opt> {
-        match s {
-            "day" => Some(Opt::Day),
-            "index" => Some(Opt::Index),
-            _ => None,
-        }
-    }
+    Default
 }
 
 #[derive(Debug, PartialEq)]
 pub enum Flag {
     Formatting,
+    Index,
+    Query,
 }
 impl Flag {
     pub fn from_string(s: &str) -> Option<Flag> {
         match s {
             "-f" => Some(Flag::Formatting),
+            "-i" => Some(Flag::Index),
             _ => None,
         }
     }
-    pub fn options(self: Self) -> Vec<Opt> {
+    pub fn allowed_options(self: Self) -> Vec<Opt> {
         match self {
-            Flag::Formatting => vec![Opt::Day],
+            Flag::Formatting => vec![Opt::Day, Opt::Index],
+            Flag::Index => vec![],
+            Flag::Query => vec![],
         }
     }
 }
@@ -69,6 +66,16 @@ pub enum ActionResponseType {
 #[derive(Debug, PartialEq)]
 pub enum Formatting {
     Day,
+    Index,
+}
+impl Formatting {
+    pub fn from_string(s: &str) -> Option<Opt> {
+        match s {
+            "day" => Some(Opt::Day),
+            "index" => Some(Opt::Index),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -131,7 +138,7 @@ impl Session<'_> {
             Some(Action::MarkAsDone) => {
                 match argument {
                     Some(arg) => {
-                        self.mark_as_done(&arg);
+                        self.mark_as_done(&arg, flags);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
@@ -146,7 +153,7 @@ impl Session<'_> {
             Some(Action::MarkAsUndone) => {
                 match argument {
                     Some(arg) => {
-                        self.mark_as_undone(&arg);
+                        self.mark_as_undone(&arg, flags);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
@@ -184,14 +191,13 @@ impl Session<'_> {
         self.action_responses.push(ActionResponse {
             message: "dro added",
             _type: ActionResponseType::Success,
-            dros: Some(vec!(dro)),
+            dros: Some(vec![dro]),
             formatting: None,
         });
     }
 
     fn show_dros(&mut self, flags: Option<Vec<FlagWithOpts>>) {
         let dros = db::get_dros();
-
 
         let formatting = get_formatting(flags);
         match dros {
@@ -200,7 +206,7 @@ impl Session<'_> {
                     message: "",
                     _type: ActionResponseType::Content,
                     dros: Some(dros),
-                    formatting
+                    formatting,
                 });
             }
             Err(_) => todo!(),
@@ -238,40 +244,85 @@ impl Session<'_> {
     }
 
     fn get_dro_from_query(&self, query: &str, dros: Vec<Dro>) -> Option<Dro> {
-        dros.into_iter().find(|dro| dro.description.contains(&query.to_string()))
+        dros.into_iter()
+            .find(|dro| dro.description.contains(&query.to_string()))
     }
 
-    fn mark_as_done(&mut self, arg: &str) -> Option<()> {
-        // commented code is for index selection instead of query
-        // let index: &usize = &self.get_index_from_arg(arg)?;
+    fn mark_as_done(&mut self, arg: &str, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
-        // let dro: Dro = self.get_dro_from_index(index, dros)?;
-        let dro: Dro = self.get_dro_from_query(arg, dros)?;
+        let dro: Dro;
+        if flags.is_some() {
+            let flag = flags.as_deref().unwrap().first().unwrap();
+
+            match flag.flag {
+                Flag::Index => {
+                    let argument = arw_brr::get_argument_at(2);
+                    let index: &usize = &self.get_index_from_arg(&argument.expect("No matching index argument.").to_string())?;
+                    dro = self.get_dro_from_index(index, dros)?;
+                }
+                Flag::Query => {
+                    dro = self.get_dro_from_query(arg, dros)?;
+                }
+                _ => {
+                    self.action_responses.push(ActionResponse {
+                        formatting: None,
+                        message: "Flag not valid for this action.",
+                        _type: ActionResponseType::Error,
+                        dros: None,
+                    });
+                    return None;
+                }
+            }
+        } else {
+            dro = self.get_dro_from_query(arg, dros)?;
+        }
 
         db::mark_dro_as_done(&dro.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            dros: Some(vec!(dro)),
+            dros: Some(vec![dro]),
             formatting: None,
         });
         Some(())
     }
 
-    fn mark_as_undone(&mut self, arg: &str) -> Option<()> {
-        // commented code is for index selection instead of query
-        // let index: usize = self.get_index_from_arg(arg)?;
+    fn mark_as_undone(&mut self, arg: &str, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
-        // let dro = self.get_dro_from_index(&index, dros)?;
-        let dro: Dro = self.get_dro_from_query(arg, dros)?;
+        let dro: Dro;
+        if flags.is_some() {
+            let flag = flags.as_deref().unwrap().first().unwrap();
+
+            match flag.flag {
+                Flag::Index => {
+                    let argument = arw_brr::get_argument_at(2);
+                    let index: &usize = &self.get_index_from_arg(&argument.expect("No matching index argument.").to_string())?;
+                    dro = self.get_dro_from_index(index, dros)?;
+                }
+                Flag::Query => {
+                    dro = self.get_dro_from_query(arg, dros)?;
+                }
+                _ => {
+                    self.action_responses.push(ActionResponse {
+                        formatting: None,
+                        message: "Flag not valid for this action.",
+                        _type: ActionResponseType::Error,
+                        dros: None,
+                    });
+                    return None;
+                }
+            }
+        } else {
+            dro = self.get_dro_from_query(arg, dros)?;
+        }
 
         db::mark_dro_as_undone(&dro.description)
             .expect(&("could not update dro at position ".to_owned() + &arg));
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            dros: Some(vec!(dro)),
+            dros: Some(vec![dro]),
             formatting: None,
         });
         Some(())
@@ -327,18 +378,26 @@ impl Session<'_> {
             };
 
             for item in iter {
-                let opt = Opt::from_string(&item);
-                if opt.is_none() {
-                    self.action_responses.push(ActionResponse {
-                        formatting: None,
-                        message: "Unknown option ",
-                        _type: ActionResponseType::Error,
-                        dros: None,
-                    });
-                    continue;
-                };
+                let opt; 
 
-                fwo.opts.push(opt.unwrap());
+                match fwo.flag {
+                    Flag::Formatting => {
+                        opt = Formatting::from_string(&item);
+                        if opt.is_none() {
+                            self.action_responses.push(ActionResponse {
+                                formatting: None,
+                                message: "Unknown option ",
+                                _type: ActionResponseType::Error,
+                                dros: None,
+                            });
+                            continue;
+                        };
+                    },
+                    Flag::Index => {opt = None},
+                    Flag::Query => {opt = None},
+                }
+
+                fwo.opts.push(opt.unwrap_or_else(|| Opt::Default));
             }
             res.push(fwo);
         }
@@ -350,7 +409,10 @@ fn get_formatting(flags: Option<Vec<FlagWithOpts>>) -> Option<FlagWithOpts> {
     if flags.is_none() {
         return None;
     }
-    flags.unwrap().into_iter().find(|f| f.flag == Flag::Formatting)
+    flags
+        .unwrap()
+        .into_iter()
+        .find(|f| f.flag == Flag::Formatting)
 }
 
 #[derive(Debug, PartialEq)]

@@ -1,6 +1,5 @@
 use arw_brr::get_app_path;
 use rusqlite::{Connection, Result};
-use std::fs;
 
 #[derive(Debug)]
 pub struct Dro {

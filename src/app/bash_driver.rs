@@ -31,6 +31,7 @@ pub fn display_action_response(res: &ActionResponse) {
                     Opt::Day => {
                         print!("{} ", dro.created.as_ref().unwrap(),)
                     }
+                    _ => {},
                 }
                 }
             }
