@@ -28,14 +28,18 @@ cargo install dro
 
 ### docs
 ```
-Command:        Argument:
+Command:         Options:   Argument:
+                 
+ls, list         -f         -             view all dros
+a, add                      description   add new dro with <description>
+md, markdone                index         mark dro at position <index> as done
+mu, markundone              index         mark dro at position <index> as undone
+pu, purge                   -             deletes all dros that are marked as done
+h, help                     -             see documentation
+v, version                  -             see current version
 
-s, see          -                   view all dros
-a, add          description         add new dro with <description>
-md, markdone    index               mark dro at position <index> as done
-mu, markundone  index               mark dro at position <index> as undone
-pu, purge       -                   deletes all dros that are marked as done
-h, help         -                   see documentation
-v, version      -                   see current version
 
+Options:
+
+-f/-format | d/date | i/index
 ```
