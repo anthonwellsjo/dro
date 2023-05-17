@@ -5,7 +5,7 @@ mod db;
 
 #[derive(Debug, PartialEq)]
 pub enum Action {
-    See,
+    List,
     Add,
     MarkAsDone,
     MarkAsUndone,
@@ -16,7 +16,7 @@ pub enum Action {
 impl Action {
     pub fn from_string(s: &str) -> Option<Action> {
         match s {
-            "s" | "l" | "see" => Some(Action::See),
+            "ls" | "list" | "see" => Some(Action::List),
             "a" | "add" => Some(Action::Add),
             "md" | "markdone" => Some(Action::MarkAsDone),
             "mu" | "markundone" => Some(Action::MarkAsUndone),
@@ -30,9 +30,9 @@ impl Action {
 
 #[derive(Debug, PartialEq)]
 pub enum Opt {
-    Day,
+    Date,
     Index,
-    Default
+    Default,
 }
 
 #[derive(Debug, PartialEq)]
@@ -51,7 +51,7 @@ impl Flag {
     }
     pub fn allowed_options(self: Self) -> Vec<Opt> {
         match self {
-            Flag::Formatting => vec![Opt::Day, Opt::Index],
+            Flag::Formatting => vec![Opt::Date, Opt::Index],
             Flag::Index => vec![],
             Flag::Query => vec![],
         }
@@ -71,8 +71,8 @@ pub enum Formatting {
 impl Formatting {
     pub fn from_string(s: &str) -> Option<Opt> {
         match s {
-            "day" => Some(Opt::Day),
-            "index" => Some(Opt::Index),
+            "date" | "d" => Some(Opt::Date),
+            "index" | "i" => Some(Opt::Index),
             _ => None,
         }
     }
@@ -100,13 +100,13 @@ impl Session<'_> {
     pub fn run(
         &mut self,
         action: Option<Action>,
-        argument: Option<String>,
+        arguments: Option<Vec<String>>,
         flags: Vec<Vec<String>>,
     ) {
         let flags = self.parse_flags(&flags);
 
         match action {
-            Some(Action::See) => {
+            Some(Action::List) => {
                 self.show_dros(flags);
             }
             Some(Action::Purge) => {
@@ -121,9 +121,9 @@ impl Session<'_> {
 
             // todo: make wrapper for all actions that need arg
             Some(Action::Add) => {
-                match argument {
-                    Some(arg) => {
-                        self.add_dro(&arg);
+                match arguments {
+                    Some(args) => {
+                        self.add_dro(&args);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
@@ -136,9 +136,9 @@ impl Session<'_> {
                 };
             }
             Some(Action::MarkAsDone) => {
-                match argument {
-                    Some(arg) => {
-                        self.mark_as_done(&arg, flags);
+                match arguments {
+                    Some(args) => {
+                        self.mark_as_done(&args, flags);
                     }
                     None => {
                         self.action_responses.push(ActionResponse {
@@ -151,7 +151,7 @@ impl Session<'_> {
                 };
             }
             Some(Action::MarkAsUndone) => {
-                match argument {
+                match arguments {
                     Some(arg) => {
                         self.mark_as_undone(&arg, flags);
                     }
@@ -176,22 +176,26 @@ impl Session<'_> {
         }
     }
 
-    fn add_dro(&mut self, argument: &str) {
-        let dro = db::Dro::new(argument);
-        match db::save_dro_to_db(&dro) {
-            Ok(_) => &(),
-            Err(_) => &self.action_responses.push(ActionResponse {
-                message: "database didn't want to save this dro",
-                _type: ActionResponseType::Error,
-                dros: None,
-                formatting: None,
-            }),
-        };
+    fn add_dro(&mut self, args: &Vec<String>) {
+        let mut dros = vec![];
+        for argument in args.into_iter() {
+            let dro = db::Dro::new(argument);
+            match db::save_dro_to_db(&dro) {
+                Ok(_) => &(),
+                Err(_) => &self.action_responses.push(ActionResponse {
+                    message: "database didn't want to save this dro",
+                    _type: ActionResponseType::Error,
+                    dros: None,
+                    formatting: None,
+                }),
+            };
+            dros.push(dro);
+        }
 
         self.action_responses.push(ActionResponse {
             message: "dro added",
             _type: ActionResponseType::Success,
-            dros: Some(vec![dro]),
+            dros: Some(dros),
             formatting: None,
         });
     }
@@ -248,20 +252,24 @@ impl Session<'_> {
             .find(|dro| dro.description.contains(&query.to_string()))
     }
 
-    fn mark_as_done(&mut self, arg: &str, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
+    fn mark_as_done(&mut self, args: &Vec<String>, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
-        let dro: Dro;
-        if flags.is_some() {
+        let mut dros_to_update: Vec<Dro> = vec![];
+        if flags.is_some() && flags.as_deref().unwrap().len() > 0 {
+            println!("flags: {:?}", flags);
             let flag = flags.as_deref().unwrap().first().unwrap();
 
             match flag.flag {
                 Flag::Index => {
-                    let argument = arw_brr::get_argument_at(2);
-                    let index: &usize = &self.get_index_from_arg(&argument.expect("No matching index argument.").to_string())?;
-                    dro = self.get_dro_from_index(index, dros)?;
+                    for arg in args.clone().iter() {
+                        let index: &usize = &self.get_index_from_arg(arg)?;
+                        dros_to_update.push(self.get_dro_from_index(index, dros.clone())?);
+                    }
                 }
                 Flag::Query => {
-                    dro = self.get_dro_from_query(arg, dros)?;
+                    for arg in args.iter() {
+                        dros_to_update.push(self.get_dro_from_query(arg, dros.clone())?);
+                    }
                 }
                 _ => {
                     self.action_responses.push(ActionResponse {
@@ -274,34 +282,42 @@ impl Session<'_> {
                 }
             }
         } else {
-            dro = self.get_dro_from_query(arg, dros)?;
+            for arg in args.iter() {
+                dros_to_update.push(self.get_dro_from_query(arg, dros.clone())?);
+            }
         }
 
-        db::mark_dro_as_done(&dro.description)
-            .expect(&("could not update dro at position ".to_owned() + &arg));
+        for dro in dros_to_update.clone() {
+            db::mark_dro_as_done(&dro.description)
+                .expect(&("could not update dro ".to_owned() + &dro.description));
+        }
+
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            dros: Some(vec![dro]),
+            dros: Some(dros_to_update),
             formatting: None,
         });
         Some(())
     }
 
-    fn mark_as_undone(&mut self, arg: &str, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
+    fn mark_as_undone(&mut self, args: &Vec<String>, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
-        let dro: Dro;
+        let mut dros_to_update: Vec<Dro> = vec![];
         if flags.is_some() {
             let flag = flags.as_deref().unwrap().first().unwrap();
 
             match flag.flag {
                 Flag::Index => {
-                    let argument = arw_brr::get_argument_at(2);
-                    let index: &usize = &self.get_index_from_arg(&argument.expect("No matching index argument.").to_string())?;
-                    dro = self.get_dro_from_index(index, dros)?;
+                    for arg in args.iter() {
+                        let index: &usize = &self.get_index_from_arg(arg)?;
+                        dros_to_update.push(self.get_dro_from_index(index, dros.clone())?);
+                    }
                 }
                 Flag::Query => {
-                    dro = self.get_dro_from_query(arg, dros)?;
+                    for arg in args.iter() {
+                        dros_to_update.push(self.get_dro_from_query(arg, dros.clone())?);
+                    }
                 }
                 _ => {
                     self.action_responses.push(ActionResponse {
@@ -314,19 +330,25 @@ impl Session<'_> {
                 }
             }
         } else {
-            dro = self.get_dro_from_query(arg, dros)?;
+            for arg in args.iter() {
+                dros_to_update.push(self.get_dro_from_query(arg, dros.clone())?);
+            }
         }
 
-        db::mark_dro_as_undone(&dro.description)
-            .expect(&("could not update dro at position ".to_owned() + &arg));
+        for dro in dros_to_update.clone() {
+            db::mark_dro_as_undone(&dro.description)
+                .expect(&("could not update dro ".to_owned() + &dro.description));
+        }
+
         self.action_responses.push(ActionResponse {
             message: "dro updated",
             _type: ActionResponseType::Success,
-            dros: Some(vec![dro]),
+            dros: Some(dros_to_update),
             formatting: None,
         });
         Some(())
     }
+
 
     fn purge_dros(&mut self) {
         db::purge_dros().expect("A problem occured while purging.");
@@ -378,7 +400,7 @@ impl Session<'_> {
             };
 
             for item in iter {
-                let opt; 
+                let opt;
 
                 match fwo.flag {
                     Flag::Formatting => {
@@ -392,9 +414,9 @@ impl Session<'_> {
                             });
                             continue;
                         };
-                    },
-                    Flag::Index => {opt = None},
-                    Flag::Query => {opt = None},
+                    }
+                    Flag::Index => opt = None,
+                    Flag::Query => opt = None,
                 }
 
                 fwo.opts.push(opt.unwrap_or_else(|| Opt::Default));

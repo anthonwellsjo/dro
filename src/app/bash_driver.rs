@@ -28,7 +28,7 @@ pub fn display_action_response(res: &ActionResponse) {
                     Opt::Index => {
                             print!("{} ", index)
                         }
-                    Opt::Day => {
+                    Opt::Date => {
                         print!("{} ", dro.created.as_ref().unwrap(),)
                     }
                     _ => {},

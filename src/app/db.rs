@@ -1,7 +1,7 @@
 use arw_brr::get_app_path;
 use rusqlite::{Connection, Result};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Dro {
     pub description: String,
     pub done: bool,
