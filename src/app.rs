@@ -304,7 +304,7 @@ impl Session<'_> {
     fn mark_as_undone(&mut self, args: &Vec<String>, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
         let mut dros_to_update: Vec<Dro> = vec![];
-        if flags.is_some() {
+        if flags.is_some() && flags.as_deref().unwrap().len() > 0 {
             let flag = flags.as_deref().unwrap().first().unwrap();
 
             match flag.flag {
