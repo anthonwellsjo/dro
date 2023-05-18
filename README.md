@@ -43,3 +43,13 @@ Options:
 
 -f/-format | d/date | i/index
 ```
+
+### recommended aliases
+```
+# DRO
+alias d=‘dro’
+alias da=‘dro add’
+alias dls=‘dro list -f index’
+alias dd=‘dro md -i’
+alias ddi=‘dro md -i’
+```
