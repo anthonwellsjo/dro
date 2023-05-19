@@ -28,20 +28,20 @@ cargo install dro
 
 ### docs
 ```
-Command:         Options:   Argument:
+Command:         Flag:      Argument:
                  
-ls, list         -f         -             view all dros
+ls, list         -f <opt>   -             view all dros
 a, add                      description   add new dro with <description>
-md, markdone                index         mark dro at position <index> as done
-mu, markundone              index         mark dro at position <index> as undone
+md, markdone     -i         query/index   mark dro at position <index> as done
+mu, markundone   -i         query/index   mark dro at position <index> as undone
 pu, purge                   -             deletes all dros that are marked as done
 h, help                     -             see documentation
 v, version                  -             see current version
 
 
-Options:
+Flag options:
 
--f/-format | d/date | i/index
+-f/-format: d/date, i/index
 ```
 
 ### recommended aliases
