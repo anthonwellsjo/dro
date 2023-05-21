@@ -1,3 +1,5 @@
+use std::fs;
+
 use self::db::Dro;
 
 pub mod bash_driver;
@@ -12,10 +14,12 @@ pub enum Action {
     Purge,
     Help,
     Version,
+    Init,
 }
 impl Action {
     pub fn from_string(s: &str) -> Option<Action> {
         match s {
+            "init" => Some(Action::Init),
             "ls" | "list" | "see" => Some(Action::List),
             "a" | "add" => Some(Action::Add),
             "md" | "markdone" => Some(Action::MarkAsDone),
@@ -39,7 +43,6 @@ pub enum Opt {
 pub enum Flag {
     Formatting,
     Index,
-    Query,
 }
 impl Flag {
     pub fn from_string(s: &str) -> Option<Flag> {
@@ -53,7 +56,6 @@ impl Flag {
         match self {
             Flag::Formatting => vec![Opt::Date, Opt::Index],
             Flag::Index => vec![],
-            Flag::Query => vec![],
         }
     }
 }
@@ -64,10 +66,7 @@ pub enum ActionResponseType {
     Content,
 }
 #[derive(Debug, PartialEq)]
-pub enum Formatting {
-    Day,
-    Index,
-}
+pub enum Formatting {}
 impl Formatting {
     pub fn from_string(s: &str) -> Option<Opt> {
         match s {
@@ -106,6 +105,9 @@ impl Session<'_> {
         let flags = self.parse_flags(&flags);
 
         match action {
+            Some(Action::Init) => {
+                self.init(flags);
+            }
             Some(Action::List) => {
                 self.show_dros(flags);
             }
@@ -174,6 +176,16 @@ impl Session<'_> {
                 });
             }
         }
+    }
+
+    fn init(&mut self, _flags: Option<Vec<FlagWithOpts>>) {
+        db::create_local_db().unwrap();
+        self.action_responses.push(ActionResponse {
+                    message: "created a local db for this folder.",
+                    _type: ActionResponseType::Success,
+                    dros: None,
+                    formatting: None,
+                });
     }
 
     fn add_dro(&mut self, args: &Vec<String>) {
@@ -266,11 +278,6 @@ impl Session<'_> {
                         dros_to_update.push(self.get_dro_from_index(index, dros.clone())?);
                     }
                 }
-                Flag::Query => {
-                    for arg in args.iter() {
-                        dros_to_update.push(self.get_dro_from_query(arg, dros.clone())?);
-                    }
-                }
                 _ => {
                     self.action_responses.push(ActionResponse {
                         formatting: None,
@@ -301,7 +308,11 @@ impl Session<'_> {
         Some(())
     }
 
-    fn mark_as_undone(&mut self, args: &Vec<String>, flags: Option<Vec<FlagWithOpts>>) -> Option<()> {
+    fn mark_as_undone(
+        &mut self,
+        args: &Vec<String>,
+        flags: Option<Vec<FlagWithOpts>>,
+    ) -> Option<()> {
         let dros: Vec<Dro> = db::get_dros().expect("fatal error while getting dros.");
         let mut dros_to_update: Vec<Dro> = vec![];
         if flags.is_some() && flags.as_deref().unwrap().len() > 0 {
@@ -312,11 +323,6 @@ impl Session<'_> {
                     for arg in args.iter() {
                         let index: &usize = &self.get_index_from_arg(arg)?;
                         dros_to_update.push(self.get_dro_from_index(index, dros.clone())?);
-                    }
-                }
-                Flag::Query => {
-                    for arg in args.iter() {
-                        dros_to_update.push(self.get_dro_from_query(arg, dros.clone())?);
                     }
                 }
                 _ => {
@@ -348,7 +354,6 @@ impl Session<'_> {
         });
         Some(())
     }
-
 
     fn purge_dros(&mut self) {
         db::purge_dros().expect("A problem occured while purging.");
@@ -416,7 +421,6 @@ impl Session<'_> {
                         };
                     }
                     Flag::Index => opt = None,
-                    Flag::Query => opt = None,
                 }
 
                 fwo.opts.push(opt.unwrap_or_else(|| Opt::Default));
