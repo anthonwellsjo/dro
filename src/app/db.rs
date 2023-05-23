@@ -1,11 +1,13 @@
-use arw_brr::get_app_path;
+use std::{fs};
+use arw_brr;
 use rusqlite::{Connection, Result};
+use walkdir::WalkDir;
 
 #[derive(Debug, Clone)]
 pub struct Dro {
     pub description: String,
     pub done: bool,
-    pub created: Option<String>
+    pub created: Option<String>,
 }
 
 impl Dro {
@@ -13,26 +15,45 @@ impl Dro {
         Dro {
             description: description.to_owned(),
             done: false,
-            created: None
+            created: None,
         }
     }
 }
 
-///  Gets connection to DB. This function will create a new DB if
-///  not already present
-pub fn get_db_connection() -> Result<Connection> {
-    let conn = Connection::open(get_app_path("dro"))?;
-    conn.execute(
-        "CREATE TABLE IF NOT EXISTS to_dos (
+pub const CREATE_TABLE_QUERY: &str = "CREATE TABLE IF NOT EXISTS to_dos (
              id INTEGER PRIMARY KEY,
              description TEXT NOT NULL,
              done BOOL NOT NULL,
              created TEXT DEFAULT CURRENT_TIMESTAMP,
              deleted BOOL DEFAULT 0
-         )",
-        [],
-    )?;
+         )";
+
+fn get_db_path() -> String {
+    let mut app_path: Option<String> = None;
+    for entry in WalkDir::new("./").into_iter().filter_map(|e| e.ok()) {
+        if entry.path().display().to_string().contains(".dro/db.sql") {
+            app_path = Some(entry.path().display().to_string());
+        }
+    }
+
+    app_path.unwrap_or(arw_brr::get_app_path("dro"))
+}
+
+///  Gets connection to DB. This function will create a new DB if
+///  not already present
+pub fn get_db_connection() -> Result<Connection> {
+    let conn = Connection::open(get_db_path())?;
+    conn.execute(CREATE_TABLE_QUERY, [])?;
     Ok(conn)
+}
+
+pub fn create_local_db() -> Result<()> {
+    let path = "./.dro/";
+    fs::create_dir_all(&path).unwrap();
+
+    let conn = Connection::open(path.to_owned() + "db.sql")?;
+    conn.execute(CREATE_TABLE_QUERY, [])?;
+    Ok(())
 }
 
 /// Gets all dros from the database
