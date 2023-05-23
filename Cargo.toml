@@ -1,6 +1,6 @@
 [package]
 name = "dro"
-version = "0.2.13"
+version = "0.2.14"
 edition = "2021"
 license = "MIT OR Apache-2.0" 
 description = "Super minimal CLI todo (dro) application."
@@ -14,7 +14,7 @@ include = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-arw_brr = {version = "0.1.8", path = '../arw_brr/'}
+arw_brr = "0.1.8"
 dirs = "4.0.0"
 rusqlite = "0.28.0"
 walkdir = "2.3.3"
