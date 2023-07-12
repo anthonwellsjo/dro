@@ -368,15 +368,20 @@ impl Session<'_> {
     fn show_help(&mut self) {
         self.action_responses.push(ActionResponse {
             message: "
-            Command:        Argument:
+            Command:         Flag:      Argument:
+                             
+            ls, list         -f <opt>   -             view all dros
+            a, add                      description   add new dro with <description>
+            md, markdone     -i         query/index   mark dro at position <index> as done
+            mu, markundone   -i         query/index   mark dro at position <index> as undone
+            pu, purge                   -             deletes all dros that are marked as done
+            h, help                     -             see documentation
+            v, version                  -             see current version
 
-            s, see          -                   View all dros
-            a, add          description         Add new dro with <description>
-            md, markdone    index               Mark dro at position <index> as done
-            mu, markundone  index               Mark dro at position <index> as undone
-            pu, purge       -                   Deletes all dros that are marked as done
-            h, help         -                   See documentation
-            v, version      -                   See current version
+
+            Flag options:
+
+            -f/-format: d/date, i/index
             ",
             _type: ActionResponseType::Content,
             dros: None,
